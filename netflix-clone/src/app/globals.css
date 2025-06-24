@@ -1,11 +1,17 @@
+/* app/globals.css */
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000; /* Netflix 배경을 위해 검은색으로 변경 */
+  --foreground: #ffffff; /* Netflix 텍스트를 위해 흰색으로 변경 */
+
+  /* Netflix 브랜드 컬러 추가 */
+  --netflix-red: #e50914;
+  --netflix-red-dark: #b81d24;
+  --netflix-red-light: #f40612;
+  --netflix-gray-dark: #141414;
+  --netflix-gray: #2f2f2f;
+  --netflix-gray-light: #737373;
 }
 
 @theme inline {
@@ -13,17 +19,154 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Netflix 컬러를 Tailwind에서 사용할 수 있도록 추가 */
+  --color-netflix-red: var(--netflix-red);
+  --color-netflix-red-dark: var(--netflix-red-dark);
+  --color-netflix-red-light: var(--netflix-red-light);
+  --color-netflix-gray-dark: var(--netflix-gray-dark);
+  --color-netflix-gray: var(--netflix-gray);
+  --color-netflix-gray-light: var(--netflix-gray-light);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000; /* 다크모드에서도 Netflix 스타일 유지 */
+    --foreground: #ffffff;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+/* Netflix 커스텀 클래스들 */
+.netflix-red {
+  color: var(--netflix-red);
+}
+
+.netflix-bg-red {
+  background-color: var(--netflix-red);
+}
+
+.netflix-bg-red-dark {
+  background-color: var(--netflix-red-dark);
+}
+
+.netflix-bg-gray-dark {
+  background-color: var(--netflix-gray-dark);
+}
+
+.netflix-bg-gray {
+  background-color: var(--netflix-gray);
+}
+
+/* Netflix 버튼 스타일 */
+.netflix-btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.netflix-btn-primary {
+  background-color: var(--netflix-red);
+  color: var(--foreground);
+}
+
+.netflix-btn-primary:hover {
+  background-color: var(--netflix-red-dark);
+  transform: scale(1.05);
+}
+
+.netflix-btn-secondary {
+  background-color: rgba(109, 109, 110, 0.7);
+  color: var(--foreground);
+  backdrop-filter: blur(10px);
+}
+
+.netflix-btn-secondary:hover {
+  background-color: rgba(109, 109, 110, 0.5);
+}
+
+/* Netflix 카드 스타일 */
+.netflix-card {
+  background-color: var(--netflix-gray-dark);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.35s ease;
+  cursor: pointer;
+}
+
+.netflix-card:hover {
+  transform: scale(1.05);
+}
+
+/* 텍스트 그라데이션 */
+.text-gradient-red {
+  background: linear-gradient(
+    45deg,
+    var(--netflix-red-light),
+    var(--netflix-red)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* 애니메이션 */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .netflix-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
 }
