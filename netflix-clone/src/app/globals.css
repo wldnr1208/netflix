@@ -1,4 +1,6 @@
-/* app/globals.css */
+/* src/app/globals.css */
+/* Next.js 15 방식의 Netflix 클론 스타일 */
+
 @import "tailwindcss";
 
 :root {
