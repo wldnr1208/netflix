@@ -5,6 +5,7 @@
 
 import React from "react";
 import Header from "@/components/layout/Header";
+import QueryProvider from "./QueryProvider";
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -30,12 +31,12 @@ export default function AppProvider({ children }: AppProviderProps) {
   };
 
   return (
-    <>
+    <QueryProvider>
       {/* Netflix 헤더 */}
       <Header transparent={true} onSearch={handleSearch} />
 
       {/* 메인 콘텐츠 - 헤더 높이만큼 padding 추가 */}
       <main className="relative pt-16 lg:pt-20">{children}</main>
-    </>
+    </QueryProvider>
   );
 }

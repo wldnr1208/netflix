@@ -88,8 +88,142 @@ export function getPasswordStrengthColor(strength: number): string {
 }
 //
 // 4단계 (영화 카드)에서 추가 예정:
-// - getImageUrl: TMDB 이미지 URL 생성
-// - formatRating: 평점을 별점으로 변환
+/**
+ * TMDB 이미지 URL을 생성하는 함수
+ * @param path - 이미지 경로 (TMDB에서 제공)
+ * @param size - 이미지 크기 (기본값: 'w500')
+ * @returns 완전한 이미지 URL
+ */
+export function getImageUrl(
+  path: string | null,
+  size: string = "w500"
+): string {
+  if (!path) return "/placeholder-movie.jpg";
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
+  return `${baseUrl}/${size}${path}`;
+}
+
+/**
+ * 영화 제목을 URL 슬러그로 변환하는 함수
+ * @param title - 영화 제목
+ * @returns URL 친화적인 슬러그
+ */
+export function createSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "") // 특수문자 제거
+    .replace(/\s+/g, "-") // 공백을 하이픈으로 변경
+    .replace(/-+/g, "-") // 연속된 하이픈을 하나로 변경
+    .trim();
+}
+
+/**
+ * 평점을 별점으로 변환하는 함수
+ * @param rating - 0-10 사이의 평점 (TMDB 기준)
+ * @returns 별점 문자열
+ */
+export function formatRating(rating: number): string {
+  const stars = Math.round(rating / 2); // 10점 만점을 5점 만점으로 변환
+  return "★".repeat(stars) + "☆".repeat(5 - stars);
+}
+
+/**
+ * 평점을 퍼센트로 변환하는 함수
+ * @param rating - 0-10 사이의 평점
+ * @returns 퍼센트 문자열
+ */
+export function formatRatingPercent(rating: number): string {
+  return `${Math.round(rating * 10)}%`;
+}
+
+/**
+ * 영화 런타임을 시간:분 형식으로 변환하는 함수
+ * @param minutes - 분 단위 런타임
+ * @returns "1시간 30분" 형식의 문자열
+ */
+export function formatRuntime(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  if (hours === 0) return `${mins}분`;
+  if (mins === 0) return `${hours}시간`;
+  return `${hours}시간 ${mins}분`;
+}
+
+/**
+ * 날짜를 포맷팅하는 함수
+ * @param dateString - ISO 날짜 문자열 (YYYY-MM-DD)
+ * @returns 포맷팅된 날짜 문자열
+ */
+export function formatDate(dateString: string): string {
+  if (!dateString) return "날짜 없음";
+
+  const date = new Date(dateString);
+  return date.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/**
+ * 연도만 추출하는 함수
+ * @param dateString - ISO 날짜 문자열 (YYYY-MM-DD)
+ * @returns 연도 문자열
+ */
+export function getYear(dateString: string): string {
+  if (!dateString) return "";
+  return new Date(dateString).getFullYear().toString();
+}
+
+/**
+ * 숫자를 K, M 단위로 포맷팅하는 함수
+ * @param num - 포맷팅할 숫자
+ * @returns 포맷팅된 문자열 (예: 1.2K, 3.4M)
+ */
+export function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return Math.floor(num / 100000) / 10 + "M";
+  }
+  if (num >= 1000) {
+    return Math.floor(num / 100) / 10 + "K";
+  }
+  return num.toString();
+}
+
+/**
+ * 영화 장르 ID를 이름으로 변환하는 함수
+ * @param genreIds - 장르 ID 배열
+ * @returns 장르 이름 배열
+ */
+export function getGenreNames(genreIds: number[]): string[] {
+  // TMDB 장르 매핑 (일부)
+  const genreMap: Record<number, string> = {
+    28: "액션",
+    12: "모험",
+    16: "애니메이션",
+    35: "코미디",
+    80: "범죄",
+    99: "다큐멘터리",
+    18: "드라마",
+    10751: "가족",
+    14: "판타지",
+    36: "역사",
+    27: "공포",
+    10402: "음악",
+    9648: "미스터리",
+    10749: "로맨스",
+    878: "SF",
+    10770: "TV 영화",
+    53: "스릴러",
+    10752: "전쟁",
+    37: "서부",
+  };
+
+  return genreIds.map((id) => genreMap[id] || "기타").slice(0, 3); // 최대 3개만
+}
 //
 // 5단계 (검색 기능)에서 추가 예정:
 // - debounce: 검색 입력 디바운싱

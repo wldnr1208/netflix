@@ -96,6 +96,125 @@ export interface LoginPageProps {
 }
 
 // TODO: 다음 단계에서 추가될 타입들
-// - Movie (영화 데이터 타입) - 4단계에서 추가 예정
-// - User (사용자 타입) - 3단계 로그인 페이지에서 추가 예정
+// 4단계에서 추가: 영화 관련 타입들
+
+/**
+ * TMDB 영화 데이터 타입
+ */
+export interface Movie {
+  id: number;
+  title: string;
+  original_title: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string;
+  vote_average: number;
+  vote_count: number;
+  genre_ids: number[];
+  adult: boolean;
+  original_language: string;
+  popularity: number;
+  video: boolean;
+}
+
+/**
+ * TMDB TV 프로그램 데이터 타입
+ */
+export interface TVShow {
+  id: number;
+  name: string;
+  original_name: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  first_air_date: string;
+  vote_average: number;
+  vote_count: number;
+  genre_ids: number[];
+  adult: boolean;
+  origin_country: string[];
+  original_language: string;
+  popularity: number;
+}
+
+/**
+ * 장르 타입
+ */
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+/**
+ * TMDB API 응답 타입
+ */
+export interface TMDBResponse<T> {
+  page: number;
+  results: T[];
+  total_pages: number;
+  total_results: number;
+}
+
+/**
+ * 영화 API 응답 타입
+ */
+export type MoviesResponse = TMDBResponse<Movie>;
+/**
+ * TV 프로그램 API 응답 타입
+ */
+export type TVShowsResponse = TMDBResponse<TVShow>;
+/**
+ * 영화 카테고리 타입
+ */
+export type MovieCategory =
+  | "now_playing"
+  | "popular"
+  | "top_rated"
+  | "upcoming";
+
+/**
+ * TV 프로그램 카테고리 타입
+ */
+export type TVCategory =
+  | "airing_today"
+  | "on_the_air"
+  | "popular"
+  | "top_rated";
+
+/**
+ * 영화 카드 컴포넌트 Props
+ */
+export interface MovieCardProps {
+  movie: Movie;
+  size?: "sm" | "md" | "lg";
+  showTitle?: boolean;
+  showOverview?: boolean;
+  onPlay?: (movie: Movie) => void;
+  onAddToWatchlist?: (movie: Movie) => void;
+  className?: string;
+}
+
+/**
+ * 영화 섹션 컴포넌트 Props
+ */
+export interface MovieSectionProps {
+  title: string;
+  category: MovieCategory;
+  className?: string;
+}
+
+/**
+ * 영화 슬라이더 컴포넌트 Props
+ */
+export interface MovieSliderProps {
+  movies: Movie[];
+  title: string;
+  isLoading?: boolean;
+  onMovieClick?: (movie: Movie) => void;
+  onMovieAddToWatchlist?: (movie: Movie) => void;
+  showSeeAll?: boolean;
+  onSeeAllClick?: () => void;
+  className?: string;
+}
 // - HeaderProps (헤더 컴포넌트) - 헤더 완성 후 추가 예정

@@ -1,6 +1,5 @@
 // src/app/page.tsx
-// 헤더 기능 테스트를 위한 홈페이지
-
+// Netflix 클론 홈페이지 - 실제 영화 데이터 포함
 "use client";
 
 import React from "react";
@@ -8,17 +7,52 @@ import { useSession } from "next-auth/react";
 import Button from "@/components/ui/Button";
 import PlayButton from "@/components/ui/PlayButton";
 
+import { useHomePageMovies } from "@/hooks/useMovies";
+import { Movie } from "@/types";
+import { MovieSliderGroup } from "@/components/ui/MovieSliderGroup";
+import MovieSlider from "@/components/ui/MovieSlider";
+
 export default function HomePage() {
   const { data: session, status } = useSession();
 
+  // 홈페이지 영화 데이터 가져오기
+  const {
+    popular,
+    nowPlaying,
+    topRated,
+    upcoming,
+    trending,
+    isLoading,
+    hasError,
+  } = useHomePageMovies();
+
+  // 영화 클릭 핸들러
+  const handleMovieClick = (movie: Movie) => {
+    console.log("영화 클릭:", movie.title);
+    // TODO: 영화 상세 페이지로 이동
+    alert(`${movie.title} 상세 페이지로 이동 (개발 예정)`);
+  };
+
+  // 찜하기 핸들러
+  const handleAddToWatchlist = (movie: Movie) => {
+    console.log("찜하기:", movie.title);
+    // TODO: Zustand store에 추가
+    alert(`${movie.title}을(를) 내가 찜한 콘텐츠에 추가했습니다!`);
+  };
+
+  // 섹션 "모두 보기" 핸들러
+  const handleSeeAllClick = (category: string) => {
+    console.log("모두 보기 클릭:", category);
+    // TODO: 카테고리별 페이지로 이동
+    alert(`${category} 전체 목록 페이지로 이동 (개발 예정)`);
+  };
+
   return (
     <div className="min-h-screen netflix-bg-gray-dark">
-      {/* 히어로 섹션 - 헤더 투명도 테스트용 */}
+      {/* ───────────────── Hero ───────────────── */}
       <section className="relative h-screen flex items-center justify-center bg-gradient-to-r from-black/80 via-transparent to-black/80">
-        {/* 배경 이미지 대신 그라데이션 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-black to-gray-900"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-black to-gray-900" />
 
-        {/* 히어로 콘텐츠 */}
         <div className="relative z-10 text-center max-w-4xl px-4">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
             <span className="text-gradient-red">NETFLIX</span> 클론
@@ -27,10 +61,10 @@ export default function HomePage() {
             Next.js 15, NextAuth, React Query, Zustand로 만든 스트리밍 서비스
           </p>
 
-          {/* 로그인 상태에 따른 다른 메시지 */}
+          {/* 로그인 상태 메시지 */}
           {status === "loading" ? (
             <div className="animate-pulse">
-              <div className="h-6 bg-white/20 rounded w-64 mx-auto mb-8"></div>
+              <div className="h-6 bg-white/20 rounded w-64 mx-auto mb-8" />
             </div>
           ) : session?.user ? (
             <div className="mb-8">
@@ -38,8 +72,7 @@ export default function HomePage() {
                 안녕하세요, {session.user.name}님! 👋
               </p>
               <p className="text-netflix-gray-light text-sm">
-                {session.user.provider === "google" ? "Google" : "이메일"}로
-                로그인됨
+                최신 영화와 TV 프로그램을 즐겨보세요
               </p>
             </div>
           ) : (
@@ -48,7 +81,6 @@ export default function HomePage() {
             </p>
           )}
 
-          {/* 버튼들 - 헤더 버튼과 구분하기 위해 */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
             <PlayButton size="lg" onPlay={() => alert("재생 버튼 클릭!")} />
             <Button
@@ -62,8 +94,91 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 로그인 기능 테스트 섹션 */}
-      <section className="py-16 px-4">
+      {/* ───────────────── Main ───────────────── */}
+      <main className="pb-16">
+        {/* API 오류 알림 */}
+        {hasError && (
+          <section className="py-8 px-4">
+            <div className="container mx-auto">
+              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6 text-center">
+                <h3 className="text-xl font-semibold text-red-400 mb-2">
+                  ⚠️ API 연결 오류
+                </h3>
+                <p className="text-netflix-gray-light">
+                  TMDB API 키를 확인해주세요. (.env.local)
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 슬라이더 묶음 */}
+        <MovieSliderGroup className="px-4">
+          <MovieSlider
+            title="🔥 지금 뜨는 콘텐츠"
+            movies={
+              trending.data?.results.filter((m): m is Movie => "title" in m) ??
+              []
+            }
+            isLoading={trending.isLoading}
+            onMovieClick={handleMovieClick}
+            onMovieAddToWatchlist={handleAddToWatchlist}
+            onSeeAllClick={() => handleSeeAllClick("트렌딩")}
+          />
+
+          <MovieSlider
+            title="🍿 인기 영화"
+            movies={popular.data?.results ?? []}
+            isLoading={popular.isLoading}
+            onMovieClick={handleMovieClick}
+            onMovieAddToWatchlist={handleAddToWatchlist}
+            onSeeAllClick={() => handleSeeAllClick("인기 영화")}
+          />
+
+          <MovieSlider
+            title="🎬 현재 상영중"
+            movies={nowPlaying.data?.results ?? []}
+            isLoading={nowPlaying.isLoading}
+            onMovieClick={handleMovieClick}
+            onMovieAddToWatchlist={handleAddToWatchlist}
+            onSeeAllClick={() => handleSeeAllClick("현재 상영중")}
+          />
+
+          <MovieSlider
+            title="⭐ 높은 평점"
+            movies={
+              topRated.data?.results.filter((m): m is Movie => "title" in m) ??
+              []
+            }
+            isLoading={topRated.isLoading}
+            onMovieClick={handleMovieClick}
+            onMovieAddToWatchlist={handleAddToWatchlist}
+            onSeeAllClick={() => handleSeeAllClick("높은 평점")}
+          />
+
+          <MovieSlider
+            title="🔜 개봉 예정"
+            movies={upcoming.data?.results ?? []}
+            isLoading={upcoming.isLoading}
+            onMovieClick={handleMovieClick}
+            onMovieAddToWatchlist={handleAddToWatchlist}
+            onSeeAllClick={() => handleSeeAllClick("개봉 예정")}
+          />
+        </MovieSliderGroup>
+      </main>
+
+      {/* 글로벌 로딩 토스트 */}
+      {isLoading && (
+        <div className="fixed bottom-4 right-4 bg-netflix-red text-white px-4 py-2 rounded-lg shadow-lg">
+          <div className="flex items-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+            <span className="text-sm">영화 데이터 로딩 중...</span>
+          </div>
+        </div>
+      )}
+
+      {/* 기존 테스트 섹션들... */}
+      <section className="py-16 px-4 border-t border-netflix-gray/20">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8">
             🔐 로그인 기능 테스트
@@ -89,10 +204,6 @@ export default function HomePage() {
                   <p className="text-sm text-netflix-gray-light">
                     이메일: {session.user.email}
                   </p>
-                  <p className="text-sm text-netflix-gray-light">
-                    제공자:{" "}
-                    {session.user.provider === "google" ? "Google" : "이메일"}
-                  </p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -104,127 +215,40 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* 기능 테스트 카드들 */}
-            {[
-              {
-                title: "이메일 로그인",
-                description: "/auth/signin 페이지에서 테스트",
-                test: "📧 test@netflix.com / password123",
-              },
-              {
-                title: "Google 로그인",
-                description: "Google OAuth로 소셜 로그인",
-                test: "🔗 구글 계정 필요",
-              },
-              {
-                title: "회원가입",
-                description: "/auth/signup 페이지에서 가입",
-                test: "📝 새 계정 만들기",
-              },
-              {
-                title: "프로필 메뉴",
-                description: "로그인 후 헤더 프로필 클릭",
-                test: "👤 드롭다운 메뉴 확인",
-              },
-              {
-                title: "로그아웃",
-                description: "프로필 메뉴에서 로그아웃",
-                test: "🚪 세션 종료 테스트",
-              },
-            ].map((item, index) => (
-              <div key={index} className="netflix-card p-6">
-                <h3 className="text-xl font-semibold text-white mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-netflix-gray-light mb-4">
-                  {item.description}
+            {/* API 상태 카드 */}
+            <div className="netflix-card p-6">
+              <h3 className="text-xl font-semibold text-white mb-3">
+                TMDB API 상태
+              </h3>
+              <div className="space-y-2">
+                {hasError ? (
+                  <p className="text-red-400">❌ API 연결 실패</p>
+                ) : (
+                  <p className="text-green-400">✅ API 연결 성공</p>
+                )}
+                <p className="text-sm text-netflix-gray-light">
+                  로딩 상태: {isLoading ? "로딩 중..." : "완료"}
                 </p>
-                <div className="netflix-bg-red/20 rounded p-3">
-                  <p className="text-sm text-white font-medium">{item.test}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 기존 스크롤 테스트 섹션들... */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8">
-            📱 헤더 기능 테스트
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: "스크롤 감지",
-                description: "페이지를 스크롤하면 헤더 배경이 나타납니다",
-                test: "⬆️ 위로 스크롤해보세요",
-              },
-              {
-                title: "검색 기능",
-                description: "헤더의 검색 아이콘을 클릭해보세요",
-                test: "🔍 검색 창이 열립니다",
-              },
-              {
-                title: "모바일 메뉴",
-                description: "화면을 좁게 하고 햄버거 메뉴를 클릭해보세요",
-                test: "📱 모바일 메뉴가 나타납니다",
-              },
-              {
-                title: "네비게이션",
-                description: "헤더의 메뉴 항목들을 클릭해보세요",
-                test: "🔗 각 페이지로 이동합니다",
-              },
-              {
-                title: "로고 클릭",
-                description: "Netflix 로고를 클릭해보세요",
-                test: "🏠 홈으로 이동합니다",
-              },
-              {
-                title: "반응형 테스트",
-                description: "브라우저 창 크기를 조절해보세요",
-                test: "📏 레이아웃이 반응합니다",
-              },
-            ].map((item, index) => (
-              <div key={index} className="netflix-card p-6">
-                <h3 className="text-xl font-semibold text-white mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-netflix-gray-light mb-4">
-                  {item.description}
-                </p>
-                <div className="netflix-bg-red/20 rounded p-3">
-                  <p className="text-sm text-white font-medium">{item.test}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 추가 스크롤 콘텐츠 */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8">
-            🎬 더 많은 콘텐츠
-          </h2>
-
-          {/* 스크롤 테스트를 위한 더미 콘텐츠 */}
-          <div className="space-y-8">
-            {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="netflix-bg-gray rounded-lg p-8">
-                <h3 className="text-2xl font-semibold text-white mb-4">
-                  섹션 {i + 1}
-                </h3>
-                <p className="text-netflix-gray-light leading-relaxed">
-                  NextAuth를 이용한 로그인 시스템이 완성되었습니다! Google
-                  OAuth와 이메일/비밀번호 로그인을 지원하며, 세션 관리, 프로필
-                  드롭다운, 로그아웃 기능까지 모두 작동합니다.
+                <p className="text-sm text-netflix-gray-light">
+                  인기 영화: {popular.data?.results?.length || 0}개
                 </p>
               </div>
-            ))}
+            </div>
+
+            {/* 기능 상태 카드 */}
+            <div className="netflix-card p-6">
+              <h3 className="text-xl font-semibold text-white mb-3">
+                구현된 기능
+              </h3>
+              <div className="space-y-2 text-sm">
+                <p className="text-green-400">✅ 영화 카드 컴포넌트</p>
+                <p className="text-green-400">✅ 로딩 스켈레톤</p>
+                <p className="text-green-400">✅ React Query 캐싱</p>
+                <p className="text-green-400">✅ 그리드/행 레이아웃</p>
+                <p className="text-yellow-400">🚧 영화 상세 페이지</p>
+                <p className="text-yellow-400">🚧 찜하기 기능</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -233,10 +257,10 @@ export default function HomePage() {
       <footer className="netflix-bg-gray py-12 px-4">
         <div className="container mx-auto text-center">
           <p className="text-netflix-gray-light">
-            Netflix 클론 3단계 완성 | NextAuth 로그인 시스템 구축
+            Netflix 클론 4단계 완성 | 영화 데이터 표시 기능 구축
           </p>
           <p className="text-sm text-netflix-gray-light mt-2">
-            로그인/로그아웃, Google OAuth, 세션 관리 완료
+            TMDB API, React Query, 영화 카드 컴포넌트 완료
           </p>
         </div>
       </footer>
