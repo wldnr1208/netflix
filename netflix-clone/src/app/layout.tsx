@@ -14,14 +14,19 @@ const inter = Inter({
   display: "swap",
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#000000",
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),
   title: "Netflix Clone - 영화와 TV 프로그램을 무제한으로",
   description:
     "Netflix 클론 프로젝트 - Next.js, React Query, Zustand로 만든 스트리밍 서비스",
   keywords: ["netflix", "streaming", "movies", "tv shows", "clone"],
   authors: [{ name: "Netflix Clone Team" }],
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: "#000000",
   openGraph: {
     type: "website",
     locale: "ko_KR",

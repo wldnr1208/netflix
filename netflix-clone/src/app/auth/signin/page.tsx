@@ -27,9 +27,10 @@ export default async function SignInPage({ searchParams }: LoginPageProps) {
     redirect("/");
   }
 
-  const callbackUrl = searchParams?.callbackUrl || "/";
-  const error = searchParams?.error;
-  const message = searchParams?.message;
+  const params = await searchParams;
+  const callbackUrl = params?.callbackUrl || "/";
+  const error = params?.error;
+  const message = params?.message;
 
   return (
     <div className="min-h-screen netflix-bg-gray-dark flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

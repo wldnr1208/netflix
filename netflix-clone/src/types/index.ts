@@ -84,12 +84,15 @@ export type SocialProvider = "google" | "credentials";
 /**
  * 로그인 페이지 Props
  */
+/**
+ * 로그인 페이지 Props (Next.js 15 대응)
+ */
 export interface LoginPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     callbackUrl?: string;
     error?: string;
     message?: string;
-  };
+  }>;
 }
 
 // TODO: 다음 단계에서 추가될 타입들

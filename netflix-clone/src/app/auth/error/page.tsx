@@ -3,22 +3,16 @@
 
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/components/common/Logo";
 import Button from "@/components/ui/Button";
 
 /**
- * NextAuth 인증 오류 페이지
- *
- * 다양한 오류 유형 처리:
- * - Configuration: 설정 오류
- * - AccessDenied: 접근 거부
- * - Verification: 이메일 인증 오류
- * - Default: 알 수 없는 오류
+ * 오류 콘텐츠 컴포넌트 (Suspense로 감싸진)
  */
-export default function AuthErrorPage() {
+function ErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
@@ -111,5 +105,28 @@ export default function AuthErrorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * NextAuth 인증 오류 페이지
+ *
+ * 다양한 오류 유형 처리:
+ * - Configuration: 설정 오류
+ * - AccessDenied: 접근 거부
+ * - Verification: 이메일 인증 오류
+ * - Default: 알 수 없는 오류
+ */
+export default function AuthErrorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen netflix-bg-gray-dark flex items-center justify-center">
+          <div className="animate-spin w-8 h-8 border-2 border-white/30 border-t-white rounded-full" />
+        </div>
+      }
+    >
+      <ErrorContent />
+    </Suspense>
   );
 }
