@@ -1,5 +1,5 @@
 // src/components/providers/AppProvider.tsx
-// Client Component로 헤더와 전역 상태를 관리
+// Client Component로 헤더와 메인 콘텐츠를 관리
 
 "use client";
 
@@ -11,12 +11,15 @@ interface AppProviderProps {
 }
 
 /**
- * 앱 전체를 감싸는 Client Component
+ * 메인 앱 레이아웃 Provider
  *
  * 역할:
  * - Header 컴포넌트 관리 (이벤트 핸들러 포함)
+ * - 메인 콘텐츠 레이아웃 관리
  * - 나중에 React Query Provider 추가 예정
  * - 나중에 Zustand Store Provider 추가 예정
+ *
+ * 참고: SessionProvider는 SessionWrapper에서 제공됨
  */
 export default function AppProvider({ children }: AppProviderProps) {
   // 검색 기능 핸들러

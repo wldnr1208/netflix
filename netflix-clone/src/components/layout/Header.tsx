@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/common/Logo";
 import Button from "@/components/ui/Button";
@@ -16,7 +17,6 @@ import ChevronDownIcon from "@/components/ui/icons/ChevronDownIcon";
 
 // 현재 Header에서만 사용하는 타입 (나중에 types/index.ts로 이동 예정)
 interface HeaderProps {
-  // user?: User; // User 타입 아직 정의 안됨
   onSearch?: (query: string) => void;
   transparent?: boolean;
 }
@@ -28,17 +28,15 @@ interface HeaderProps {
  * - 스크롤에 따른 배경 투명도 변경
  * - 반응형 네비게이션 메뉴
  * - 검색 기능
- * - 사용자 프로필 드롭다운
+ * - 사용자 프로필 드롭다운 (NextAuth 연동)
  */
-export default function Header({
-  // user, // User 타입 정의되면 주석 해제
-  onSearch,
-  transparent = false,
-}: HeaderProps) {
+export default function Header({ onSearch, transparent = false }: HeaderProps) {
+  const { data: session, status } = useSession();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // 스크롤 이벤트 처리
   useEffect(() => {
@@ -50,11 +48,33 @@ export default function Header({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (isProfileMenuOpen && !target.closest("[data-profile-menu]")) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isProfileMenuOpen]);
+
   // 검색 처리
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim() && onSearch) {
       onSearch(searchQuery.trim());
+    }
+  };
+
+  // 로그아웃 처리
+  const handleSignOut = async () => {
+    try {
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
+      console.error("로그아웃 오류:", error);
     }
   };
 
@@ -147,22 +167,64 @@ export default function Header({
             </button>
 
             {/* 사용자 프로필 */}
-            {/* user가 정의되면 활성화 예정 */}
-            {false ? ( // user ? ( 로 나중에 변경
-              <div className="relative">
-                <button className="flex items-center space-x-2 p-2 rounded hover:bg-white/10 transition-colors duration-200">
+            {status === "loading" ? (
+              <div className="w-8 h-8 bg-netflix-gray rounded animate-pulse"></div>
+            ) : session?.user ? (
+              <div className="relative" data-profile-menu>
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="flex items-center space-x-2 p-2 rounded hover:bg-white/10 transition-colors duration-200"
+                >
                   <div className="w-8 h-8 bg-netflix-red rounded flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      U {/* {user.name.charAt(0).toUpperCase()} */}
+                      {session.user.name?.charAt(0).toUpperCase() || "U"}
                     </span>
                   </div>
                   <ChevronDownIcon />
                 </button>
+
+                {/* 프로필 드롭다운 메뉴 */}
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-netflix-gray-dark border border-netflix-gray rounded-sm shadow-lg z-50">
+                    <div className="py-2">
+                      <div className="px-4 py-2 border-b border-netflix-gray">
+                        <p className="text-sm font-medium text-white">
+                          {session.user.name}
+                        </p>
+                        <p className="text-xs text-netflix-gray-light">
+                          {session.user.email}
+                        </p>
+                      </div>
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        프로필 관리
+                      </Link>
+                      <Link
+                        href="/account"
+                        className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        계정 설정
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        로그아웃
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
-              <Button variant="primary" size="sm">
-                로그인
-              </Button>
+              <Link href="/auth/signin">
+                <Button variant="primary" size="sm">
+                  로그인
+                </Button>
+              </Link>
             )}
 
             {/* 모바일 메뉴 버튼 */}

@@ -3,6 +3,7 @@
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import SessionWrapper from "@/components/providers/SessionWrapper";
 import AppProvider from "@/components/providers/AppProvider";
 import "./globals.css";
 
@@ -127,8 +128,10 @@ export default function RootLayout({
 
         {/* 메인 앱 컨테이너 */}
         <div id="root" className="relative">
-          {/* Client Component로 헤더와 메인 콘텐츠 관리 */}
-          <AppProvider>{children}</AppProvider>
+          {/* SessionProvider로 전체 앱 감싸기 */}
+          <SessionWrapper>
+            <AppProvider>{children}</AppProvider>
+          </SessionWrapper>
 
           {/* 여기에 푸터가 들어갈 예정 */}
         </div>

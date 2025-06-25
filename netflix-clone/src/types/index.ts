@@ -35,6 +35,63 @@ export interface LogoProps {
   clickable?: boolean;
 }
 
+// 3단계에서 추가: 로그인 관련 타입들
+
+/**
+ * 사용자 타입 (NextAuth 사용자 확장)
+ */
+export interface User {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  provider?: string; // google, credentials 등
+}
+
+/**
+ * 로그인 폼 데이터
+ */
+export interface LoginFormData {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+/**
+ * 회원가입 폼 데이터
+ */
+export interface SignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+}
+
+/**
+ * 폼 유효성 검사 오류
+ */
+export interface ValidationError {
+  field: string;
+  message: string;
+}
+
+/**
+ * 소셜 로그인 제공자
+ */
+export type SocialProvider = "google" | "credentials";
+
+/**
+ * 로그인 페이지 Props
+ */
+export interface LoginPageProps {
+  searchParams?: {
+    callbackUrl?: string;
+    error?: string;
+    message?: string;
+  };
+}
+
 // TODO: 다음 단계에서 추가될 타입들
 // - Movie (영화 데이터 타입) - 4단계에서 추가 예정
 // - User (사용자 타입) - 3단계 로그인 페이지에서 추가 예정
