@@ -1,5 +1,5 @@
 // src/app/page.tsx
-// Netflix 클론 홈페이지 - 실제 영화 데이터 포함
+// Netflix 클론 홈페이지 - 영화 + TV 프로그램 데이터 포함
 "use client";
 
 import React from "react";
@@ -8,42 +8,56 @@ import Button from "@/components/ui/Button";
 import PlayButton from "@/components/ui/PlayButton";
 
 import { useHomePageMovies } from "@/hooks/useMovies";
-import { Movie } from "@/types";
+import { useHomePageTVShows } from "@/hooks/useTVShows";
+import { Movie, TVShow } from "@/types";
 import { MovieSliderGroup } from "@/components/ui/MovieSliderGroup";
 import MovieSlider from "@/components/ui/MovieSlider";
+import TVSlider from "@/components/ui/TVSlider";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
 
   // 홈페이지 영화 데이터 가져오기
   const {
-    popular,
+    popular: popularMovies,
     nowPlaying,
-    topRated,
+    topRated: topRatedMovies,
     upcoming,
-    trending,
-    isLoading,
-    hasError,
+    trending: trendingMovies,
+    isLoading: moviesLoading,
+    hasError: moviesError,
   } = useHomePageMovies();
+
+  // 홈페이지 TV 프로그램 데이터 가져오기
+  const {
+    popular: popularTV,
+    topRated: topRatedTV,
+    onTheAir,
+    airingToday,
+    trending: trendingTV,
+    isLoading: tvLoading,
+    hasError: tvError,
+  } = useHomePageTVShows();
+
+  // 전체 로딩 상태
+  const isLoading = moviesLoading || tvLoading;
+  const hasError = moviesError || tvError;
 
   // 영화 클릭 핸들러
   const handleMovieClick = (movie: Movie) => {
     console.log("영화 클릭:", movie.title);
-    // TODO: 영화 상세 페이지로 이동
     alert(`${movie.title} 상세 페이지로 이동 (개발 예정)`);
   };
 
-  // 찜하기 핸들러
-  const handleAddToWatchlist = (movie: Movie) => {
-    console.log("찜하기:", movie.title);
-    // TODO: Zustand store에 추가
-    alert(`${movie.title}을(를) 내가 찜한 콘텐츠에 추가했습니다!`);
+  // TV 프로그램 클릭 핸들러
+  const handleTVClick = (show: TVShow) => {
+    console.log("TV 프로그램 클릭:", show.name);
+    alert(`${show.name} 상세 페이지로 이동 (개발 예정)`);
   };
 
   // 섹션 "모두 보기" 핸들러
   const handleSeeAllClick = (category: string) => {
     console.log("모두 보기 클릭:", category);
-    // TODO: 카테고리별 페이지로 이동
     alert(`${category} 전체 목록 페이지로 이동 (개발 예정)`);
   };
 
@@ -112,57 +126,108 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* 슬라이더 묶음 */}
+        {/* 슬라이더 묶음 - 영화와 TV 프로그램 혼합 */}
         <MovieSliderGroup className="px-4">
+          {/* 트렌딩 영화 */}
           <MovieSlider
-            title="🔥 지금 뜨는 콘텐츠"
+            title="🔥 지금 뜨는 영화"
             movies={
-              trending.data?.results.filter((m): m is Movie => "title" in m) ??
-              []
+              trendingMovies.data?.results.filter(
+                (m): m is Movie => "title" in m
+              ) ?? []
             }
-            isLoading={trending.isLoading}
+            isLoading={trendingMovies.isLoading}
             onMovieClick={handleMovieClick}
-            onMovieAddToWatchlist={handleAddToWatchlist}
-            onSeeAllClick={() => handleSeeAllClick("트렌딩")}
+            onSeeAllClick={() => handleSeeAllClick("트렌딩 영화")}
           />
 
+          {/* 트렌딩 TV 프로그램 */}
+          <TVSlider
+            title="🔥 지금 뜨는 TV 프로그램"
+            shows={
+              trendingTV.data?.results.filter(
+                (s): s is TVShow => "name" in s
+              ) ?? []
+            }
+            isLoading={trendingTV.isLoading}
+            onShowClick={handleTVClick}
+            onSeeAllClick={() => handleSeeAllClick("트렌딩 TV")}
+          />
+
+          {/* 인기 영화 */}
           <MovieSlider
             title="🍿 인기 영화"
-            movies={popular.data?.results ?? []}
-            isLoading={popular.isLoading}
+            movies={popularMovies.data?.results ?? []}
+            isLoading={popularMovies.isLoading}
             onMovieClick={handleMovieClick}
-            onMovieAddToWatchlist={handleAddToWatchlist}
             onSeeAllClick={() => handleSeeAllClick("인기 영화")}
           />
 
+          {/* 인기 TV 프로그램 */}
+          <TVSlider
+            title="📺 인기 TV 프로그램"
+            shows={popularTV.data?.results ?? []}
+            isLoading={popularTV.isLoading}
+            onShowClick={handleTVClick}
+            onSeeAllClick={() => handleSeeAllClick("인기 TV")}
+          />
+
+          {/* 현재 상영중 영화 */}
           <MovieSlider
             title="🎬 현재 상영중"
             movies={nowPlaying.data?.results ?? []}
             isLoading={nowPlaying.isLoading}
             onMovieClick={handleMovieClick}
-            onMovieAddToWatchlist={handleAddToWatchlist}
             onSeeAllClick={() => handleSeeAllClick("현재 상영중")}
           />
 
-          <MovieSlider
-            title="⭐ 높은 평점"
-            movies={
-              topRated.data?.results.filter((m): m is Movie => "title" in m) ??
-              []
-            }
-            isLoading={topRated.isLoading}
-            onMovieClick={handleMovieClick}
-            onMovieAddToWatchlist={handleAddToWatchlist}
-            onSeeAllClick={() => handleSeeAllClick("높은 평점")}
+          {/* 현재 방영중 TV 프로그램 */}
+          <TVSlider
+            title="📡 현재 방영중"
+            shows={onTheAir.data?.results ?? []}
+            isLoading={onTheAir.isLoading}
+            onShowClick={handleTVClick}
+            onSeeAllClick={() => handleSeeAllClick("현재 방영중")}
           />
 
+          {/* 높은 평점 영화 */}
+          <MovieSlider
+            title="⭐ 높은 평점 영화"
+            movies={
+              topRatedMovies.data?.results.filter(
+                (m): m is Movie => "title" in m
+              ) ?? []
+            }
+            isLoading={topRatedMovies.isLoading}
+            onMovieClick={handleMovieClick}
+            onSeeAllClick={() => handleSeeAllClick("높은 평점 영화")}
+          />
+
+          {/* 높은 평점 TV 프로그램 */}
+          <TVSlider
+            title="⭐ 높은 평점 TV 프로그램"
+            shows={topRatedTV.data?.results ?? []}
+            isLoading={topRatedTV.isLoading}
+            onShowClick={handleTVClick}
+            onSeeAllClick={() => handleSeeAllClick("높은 평점 TV")}
+          />
+
+          {/* 개봉 예정 영화 */}
           <MovieSlider
             title="🔜 개봉 예정"
             movies={upcoming.data?.results ?? []}
             isLoading={upcoming.isLoading}
             onMovieClick={handleMovieClick}
-            onMovieAddToWatchlist={handleAddToWatchlist}
             onSeeAllClick={() => handleSeeAllClick("개봉 예정")}
+          />
+
+          {/* 오늘 방영 TV 프로그램 */}
+          <TVSlider
+            title="📅 오늘 방영"
+            shows={airingToday.data?.results ?? []}
+            isLoading={airingToday.isLoading}
+            onShowClick={handleTVClick}
+            onSeeAllClick={() => handleSeeAllClick("오늘 방영")}
           />
         </MovieSliderGroup>
       </main>
@@ -172,7 +237,7 @@ export default function HomePage() {
         <div className="fixed bottom-4 right-4 bg-netflix-red text-white px-4 py-2 rounded-lg shadow-lg">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-            <span className="text-sm">영화 데이터 로딩 중...</span>
+            <span className="text-sm">콘텐츠 로딩 중...</span>
           </div>
         </div>
       )}
@@ -180,9 +245,7 @@ export default function HomePage() {
       {/* 기존 테스트 섹션들... */}
       <section className="py-16 px-4 border-t border-netflix-gray/20">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8">
-            🔐 로그인 기능 테스트
-          </h2>
+          <h2 className="text-3xl font-bold text-white mb-8">🔐 시스템 상태</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* 로그인 상태 카드 */}
@@ -230,7 +293,10 @@ export default function HomePage() {
                   로딩 상태: {isLoading ? "로딩 중..." : "완료"}
                 </p>
                 <p className="text-sm text-netflix-gray-light">
-                  인기 영화: {popular.data?.results?.length || 0}개
+                  인기 영화: {popularMovies.data?.results?.length || 0}개
+                </p>
+                <p className="text-sm text-netflix-gray-light">
+                  인기 TV: {popularTV.data?.results?.length || 0}개
                 </p>
               </div>
             </div>
@@ -242,11 +308,11 @@ export default function HomePage() {
               </h3>
               <div className="space-y-2 text-sm">
                 <p className="text-green-400">✅ 영화 카드 컴포넌트</p>
+                <p className="text-green-400">✅ TV 프로그램 카드</p>
                 <p className="text-green-400">✅ 로딩 스켈레톤</p>
                 <p className="text-green-400">✅ React Query 캐싱</p>
-                <p className="text-green-400">✅ 그리드/행 레이아웃</p>
-                <p className="text-yellow-400">🚧 영화 상세 페이지</p>
-                <p className="text-yellow-400">🚧 찜하기 기능</p>
+                <p className="text-green-400">✅ 찜하기 기능</p>
+                <p className="text-yellow-400">🚧 상세 페이지</p>
               </div>
             </div>
           </div>
@@ -257,10 +323,10 @@ export default function HomePage() {
       <footer className="netflix-bg-gray py-12 px-4">
         <div className="container mx-auto text-center">
           <p className="text-netflix-gray-light">
-            Netflix 클론 4단계 완성 | 영화 데이터 표시 기능 구축
+            Netflix 클론 4단계 완성 | 영화 + TV 프로그램 데이터 표시 완료
           </p>
           <p className="text-sm text-netflix-gray-light mt-2">
-            TMDB API, React Query, 영화 카드 컴포넌트 완료
+            TMDB API, React Query, 영화/TV 카드 컴포넌트, 찜하기 기능 완료
           </p>
         </div>
       </footer>

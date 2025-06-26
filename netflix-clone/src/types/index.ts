@@ -1,5 +1,5 @@
 // src/types/index.ts
-// Netflix 클론 프로젝트의 기본 타입 정의 (최종 수정 버전)
+// Netflix 클론 프로젝트의 기본 타입 정의 (TV 프로그램 완성)
 
 // 현재 2단계에서 실제로 사용하는 타입들만 정의
 
@@ -157,10 +157,12 @@ export interface TMDBResponse<T> {
  * 영화 API 응답 타입
  */
 export type MoviesResponse = TMDBResponse<Movie>;
+
 /**
  * TV 프로그램 API 응답 타입
  */
 export type TVShowsResponse = TMDBResponse<TVShow>;
+
 /**
  * 영화 카테고리 타입
  */
@@ -180,7 +182,7 @@ export type TVCategory =
   | "top_rated";
 
 /**
- * 영화 카드 컴포넌트 Props (최종 버전)
+ * 영화 카드 컴포넌트 Props
  */
 export interface MovieCardProps {
   movie: Movie;
@@ -192,11 +194,98 @@ export interface MovieCardProps {
 }
 
 /**
+ * TV 카드 컴포넌트 Props
+ */
+export interface TVCardProps {
+  show: TVShow;
+  size?: "sm" | "md" | "lg";
+  showTitle?: boolean;
+  showOverview?: boolean;
+  onPlay?: (show: TVShow) => void;
+  className?: string;
+}
+
+/**
  * 영화 섹션 컴포넌트 Props
  */
 export interface MovieSectionProps {
   title: string;
   category: MovieCategory;
+  className?: string;
+}
+
+/**
+ * TV 섹션 컴포넌트 Props
+ */
+export interface TVSectionProps {
+  title: string;
+  category: TVCategory;
+  className?: string;
+}
+
+/**
+ * TV 슬라이더 컴포넌트 Props
+ */
+export interface TVSliderProps {
+  shows: TVShow[];
+  title: string;
+  isLoading?: boolean;
+  onShowClick?: (show: TVShow) => void;
+  showSeeAll?: boolean;
+  onSeeAllClick?: () => void;
+  className?: string;
+}
+
+/**
+ * 미디어 타입 (영화 또는 TV)
+ */
+export type MediaType = "movie" | "tv";
+
+/**
+ * 트렌딩 미디어 타입
+ */
+export type TrendingMediaType = "movie" | "tv" | "all";
+
+/**
+ * 시간 범위 타입
+ */
+export type TimeWindow = "day" | "week";
+
+/**
+ * 검색 결과 타입
+ */
+export interface SearchResults {
+  movies: Movie[];
+  tvShows: TVShow[];
+  totalResults: number;
+}
+
+/**
+ * 찜하기 아이템 타입
+ */
+export interface WatchlistItem {
+  id: number;
+  type: MediaType;
+  title: string;
+  name?: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  overview: string;
+  vote_average: number;
+  release_date?: string;
+  first_air_date?: string;
+  genre_ids: number[];
+  addedAt: string;
+}
+
+/**
+ * 찜하기 버튼 Props
+ */
+export interface WatchlistButtonProps {
+  item: Movie | TVShow;
+  type: MediaType;
+  size?: "sm" | "md" | "lg";
+  showLabel?: boolean;
   className?: string;
 }
 
