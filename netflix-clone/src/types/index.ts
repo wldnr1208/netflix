@@ -1,5 +1,5 @@
 // src/types/index.ts
-// Netflix 클론 프로젝트의 기본 타입 정의 (단계별로 추가)
+// Netflix 클론 프로젝트의 기본 타입 정의 (최종 수정 버전)
 
 // 현재 2단계에서 실제로 사용하는 타입들만 정의
 
@@ -82,9 +82,6 @@ export interface ValidationError {
 export type SocialProvider = "google" | "credentials";
 
 /**
- * 로그인 페이지 Props
- */
-/**
  * 로그인 페이지 Props (Next.js 15 대응)
  */
 export interface LoginPageProps {
@@ -95,7 +92,6 @@ export interface LoginPageProps {
   }>;
 }
 
-// TODO: 다음 단계에서 추가될 타입들
 // 4단계에서 추가: 영화 관련 타입들
 
 /**
@@ -124,6 +120,7 @@ export interface Movie {
 export interface TVShow {
   id: number;
   name: string;
+  title?: string;
   original_name: string;
   overview: string;
   poster_path: string | null;
@@ -183,7 +180,7 @@ export type TVCategory =
   | "top_rated";
 
 /**
- * 영화 카드 컴포넌트 Props
+ * 영화 카드 컴포넌트 Props (최종 버전)
  */
 export interface MovieCardProps {
   movie: Movie;
@@ -191,7 +188,6 @@ export interface MovieCardProps {
   showTitle?: boolean;
   showOverview?: boolean;
   onPlay?: (movie: Movie) => void;
-  onAddToWatchlist?: (movie: Movie) => void;
   className?: string;
 }
 
@@ -218,3 +214,4 @@ export interface MovieSliderProps {
   className?: string;
 }
 // - HeaderProps (헤더 컴포넌트) - 헤더 완성 후 추가 예정
+//  onAddToWatchlist?: (movie: Movie) => void;

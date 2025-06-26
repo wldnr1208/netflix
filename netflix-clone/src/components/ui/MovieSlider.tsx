@@ -1,5 +1,5 @@
 // src/components/ui/MovieSlider.tsx
-// Netflix 스타일 영화 슬라이더 컴포넌트
+// Netflix 스타일 영화 슬라이더 컴포넌트 (찜하기 기능 수정)
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
@@ -16,13 +16,13 @@ import { MovieCardSkeletonList } from "./MovieCardLayouts";
  * 1. 좌우 화살표 / 스냅 스크롤
  * 2. 마우스·터치 드래그
  * 3. 로딩 스켈레톤
+ * 4. WatchlistButton 통합 (onAddToWatchlist 제거)
  */
 export default function MovieSlider({
   movies,
   title,
   isLoading = false,
   onMovieClick,
-  onMovieAddToWatchlist,
   showSeeAll = true,
   onSeeAllClick,
   className,
@@ -149,7 +149,6 @@ export default function MovieSlider({
                   movie={movie}
                   size="md"
                   onPlay={() => onMovieClick?.(movie)}
-                  onAddToWatchlist={() => onMovieAddToWatchlist?.(movie)}
                 />
               </div>
             ))

@@ -1,10 +1,17 @@
+// src/components/ui/MovieCard.tsx
 "use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getImageUrl, formatRating, getYear, getGenreNames } from "@/lib/utils";
 import { MovieCardProps } from "@/types";
-import PlusIcon from "./icons/PlusIcon";
+import WatchlistButton from "./WatchlistButton";
+
+type MovieWithType = MovieCardProps["movie"] & {
+  type?: "movie" | "tv";
+  media_type?: "movie" | "tv";
+};
 
 export default function MovieCard({
   movie,
@@ -12,12 +19,15 @@ export default function MovieCard({
   showTitle = true,
   showOverview = false,
   onPlay,
-  onAddToWatchlist,
   className,
 }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  const typedMovie = movie as MovieWithType;
+  const itemType: "movie" | "tv" =
+    typedMovie.media_type === "tv" || typedMovie.type === "tv" ? "tv" : "movie";
 
   const sizeClasses = {
     sm: {
@@ -35,17 +45,19 @@ export default function MovieCard({
       image: "h-72 sm:h-84 md:h-96 lg:h-108",
       hoverScale: "hover:scale-105",
     },
-  };
-
+  } as const;
   const currentSize = sizeClasses[size];
+
   const posterUrl = getImageUrl(movie.poster_path, "w500");
   const genreNames = getGenreNames(movie.genre_ids);
   const year = getYear(movie.release_date);
 
+  const handlePlay = () => onPlay?.(movie);
+
   return (
     <div
       className={cn(
-        "relative group cursor-pointer transition-all duration-300 ease-out select-none pointer-events-none", // 중요!
+        "relative group cursor-pointer transition-all duration-300 ease-out",
         currentSize.container,
         currentSize.hoverScale,
         "hover:z-20",
@@ -55,13 +67,13 @@ export default function MovieCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative overflow-hidden rounded-sm netflix-card">
+        {/* ─── 이미지 ─── */}
         <div className={cn("relative", currentSize.image)}>
           {!imageError ? (
             <Image
               src={posterUrl}
               alt={movie.title}
               fill
-              draggable={false}
               className={cn(
                 "object-cover transition-opacity duration-300",
                 imageLoaded ? "opacity-100" : "opacity-0"
@@ -69,6 +81,7 @@ export default function MovieCard({
               sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, (max-width: 1024px) 224px, 288px"
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageError(true)}
+              priority={false}
             />
           ) : (
             <div className="w-full h-full bg-netflix-gray flex items-center justify-center">
@@ -78,30 +91,47 @@ export default function MovieCard({
               </div>
             </div>
           )}
+
           {!imageLoaded && !imageError && (
             <div className="absolute inset-0 bg-netflix-gray animate-pulse" />
           )}
 
           {movie.vote_average > 0 && (
-            <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-sm rounded px-2 py-1">
+            <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm rounded px-2 py-1 z-10">
               <span className="text-xs font-medium text-white">
                 ⭐ {movie.vote_average.toFixed(1)}
               </span>
             </div>
           )}
 
+          {/* ❗ z-index + hover시 가려지지 않도록 설정 */}
+          {!isHovered && (
+            <div className="absolute top-2 right-2 z-30">
+              <WatchlistButton
+                item={movie}
+                type={itemType}
+                size="sm"
+                showLabel={false}
+                className="w-8 h-8 p-0 bg-black/60 hover:bg-black/80 border-white/60"
+              />
+            </div>
+          )}
+
+          {/* ❗ 호버 배경에 pointer-events-none 추가 */}
           {isHovered && (
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
           )}
         </div>
 
+        {/* ─── 호버 상세 정보 ─── */}
         {isHovered && (
           <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => onPlay?.(movie)}
-                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors duration-200 pointer-events-auto"
+                  onClick={handlePlay}
+                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors duration-200"
+                  aria-label={`${movie.title} 재생`}
                 >
                   <svg
                     className="w-4 h-4 text-black ml-0.5"
@@ -111,13 +141,19 @@ export default function MovieCard({
                     <path d="M8 5v10l8-5z" />
                   </svg>
                 </button>
+
+                <WatchlistButton
+                  item={movie}
+                  type={itemType}
+                  size="sm"
+                  showLabel={false}
+                  className="w-8 h-8 p-0 z-30"
+                />
+
                 <button
-                  onClick={() => onAddToWatchlist?.(movie)}
-                  className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center hover:border-gray-300 transition-colors duration-200 pointer-events-auto"
+                  className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center hover:border-gray-300 transition-colors duration-200"
+                  aria-label={`${movie.title} 상세 정보`}
                 >
-                  <PlusIcon className="w-4 h-4 text-white" />
-                </button>
-                <button className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center hover:border-gray-300 transition-colors duration-200 pointer-events-auto">
                   <svg
                     className="w-4 h-4 text-white"
                     fill="currentColor"
@@ -139,12 +175,13 @@ export default function MovieCard({
               )}
             </div>
 
-            <div className="space-y-2 pointer-events-none">
+            <div className="space-y-2">
               {showTitle && (
                 <h3 className="text-sm font-semibold text-white line-clamp-2 leading-tight">
                   {movie.title}
                 </h3>
               )}
+
               <div className="flex items-center space-x-2 text-xs text-gray-300">
                 {year && <span>{year}</span>}
                 {genreNames.length > 0 && (
@@ -154,6 +191,7 @@ export default function MovieCard({
                   </>
                 )}
               </div>
+
               {showOverview && movie.overview && (
                 <p className="text-xs text-gray-300 line-clamp-3 leading-relaxed">
                   {movie.overview}
@@ -164,8 +202,9 @@ export default function MovieCard({
         )}
       </div>
 
-      {!isHovered && showTitle && (
-        <div className="mt-2 px-1 pointer-events-none">
+      {/* ─── 기본 제목 ─── */}
+      {showTitle && !isHovered && (
+        <div className="mt-2 px-1">
           <h3 className="text-sm font-medium text-white line-clamp-2 leading-tight">
             {movie.title}
           </h3>

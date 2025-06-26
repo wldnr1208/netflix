@@ -14,6 +14,7 @@ import BellIcon from "@/components/ui/icons/BellIcon";
 import MenuIcon from "@/components/ui/icons/MenuIcon";
 import XIcon from "@/components/ui/icons/XIcon";
 import ChevronDownIcon from "@/components/ui/icons/ChevronDownIcon";
+import WatchlistCounter from "../ui/WatchlistCounter";
 
 // 현재 Header에서만 사용하는 타입 (나중에 types/index.ts로 이동 예정)
 interface HeaderProps {
@@ -81,10 +82,7 @@ export default function Header({ onSearch, transparent = false }: HeaderProps) {
   // 네비게이션 메뉴 항목
   const navigationItems = [
     { name: "홈", href: "/" },
-    { name: "TV 프로그램", href: "/tv" },
-    { name: "영화", href: "/movies" },
-    { name: "최신", href: "/latest" },
-    { name: "내가 찜한 콘텐츠", href: "/my-list" },
+    { name: "내가 찜한 콘텐츠", href: "/watchlist" },
   ];
 
   return (
@@ -157,6 +155,7 @@ export default function Header({ onSearch, transparent = false }: HeaderProps) {
                 </button>
               )}
             </div>
+            <WatchlistCounter />
 
             {/* 알림 */}
             <button
