@@ -45,19 +45,16 @@ export default function HomePage() {
 
   // 영화 클릭 핸들러
   const handleMovieClick = (movie: Movie) => {
-    console.log("영화 클릭:", movie.title);
     alert(`${movie.title} 상세 페이지로 이동 (개발 예정)`);
   };
 
   // TV 프로그램 클릭 핸들러
   const handleTVClick = (show: TVShow) => {
-    console.log("TV 프로그램 클릭:", show.name);
     alert(`${show.name} 상세 페이지로 이동 (개발 예정)`);
   };
 
   // 섹션 "모두 보기" 핸들러
   const handleSeeAllClick = (category: string) => {
-    console.log("모두 보기 클릭:", category);
     alert(`${category} 전체 목록 페이지로 이동 (개발 예정)`);
   };
 

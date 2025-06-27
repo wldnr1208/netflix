@@ -61,14 +61,12 @@ export default function WatchlistButton({
    * ✅ 3. 찜하기 동작만 수행하고 절대 상세 페이지로 이동하지 않음
    * ------------------------------------------------------------------ */
   const handleClick = (e: React.MouseEvent) => {
-    console.log("[WatchlistButton] 찜하기 버튼 클릭됨", item.id);
     e.preventDefault();
     e.stopPropagation();
     toggleWatchlist();
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    console.log("[WatchlistButton] 마우스 다운 이벤트");
     e.preventDefault();
     e.stopPropagation();
   };
@@ -84,10 +82,8 @@ export default function WatchlistButton({
 
     if (isWatchlisted) {
       remove(item.id, type);
-      console.log("[WatchlistButton] 찜 해제:", item.id);
     } else {
       add(item, type);
-      console.log("[WatchlistButton] 찜 추가:", item.id);
     }
   };
 

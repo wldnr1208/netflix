@@ -19,12 +19,10 @@ export default function MoviesPage() {
   } = useHomePageMovies();
 
   const handleMovieClick = (movie: Movie) => {
-    console.log("영화 클릭:", movie.title);
     alert(`${movie.title} 상세 페이지로 이동 (개발 예정)`);
   };
 
   const handleSeeAllClick = (category: string) => {
-    console.log("모두 보기 클릭:", category);
     alert(`${category} 전체 목록 페이지로 이동 (개발 예정)`);
   };
 

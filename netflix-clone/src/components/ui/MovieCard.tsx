@@ -20,7 +20,6 @@ export default function MovieCard({
   size = "md",
   showTitle = true,
   showOverview = false,
-  onPlay,
   className,
 }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -56,14 +55,6 @@ export default function MovieCard({
   const genreNames = getGenreNames(movie.genre_ids);
   const year = getYear(movie.release_date);
 
-  // 재생 버튼 클릭 (이벤트 전파 차단)
-  const handlePlay = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log("[MovieCard] ▶ 재생 버튼 클릭", movie.id);
-    onPlay?.(movie);
-  };
-
   // 정보 버튼 클릭 (이벤트 전파 차단)
   const handleInfoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -87,7 +78,6 @@ export default function MovieCard({
         const isButton = target.closest("button");
 
         if (!isButton) {
-          console.log("[MovieCard] 카드 클릭 → 상세 페이지로 이동:", movie.id);
           e.preventDefault();
           e.stopPropagation();
           router.push(`/movies/${movie.id}`);
@@ -158,22 +148,6 @@ export default function MovieCard({
           <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                {/* 재생 버튼 */}
-                <button
-                  type="button"
-                  onClick={handlePlay}
-                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors duration-200 z-50"
-                  aria-label={`${movie.title} 재생`}
-                >
-                  <svg
-                    className="w-4 h-4 text-black ml-0.5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M8 5v10l8-5z" />
-                  </svg>
-                </button>
-
                 {/* 찜하기 버튼 */}
                 <div className="z-50">
                   <WatchlistButton

@@ -72,7 +72,6 @@ export default function WatchlistPage() {
 
   // 영화 클릭 핸들러 - 타입 안전성 개선
   const handleMovieClick = (item: WatchlistItemExtended) => {
-    console.log("영화 클릭:", item.title);
     alert(`${item.title} 상세 페이지로 이동 (개발 예정)`);
   };
 

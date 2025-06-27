@@ -47,10 +47,7 @@ export const useWatchlistStore = create<WatchlistState>()(
 
       // 찜하기 추가
       addToWatchlist: (item: Movie | TVShow, type: "movie" | "tv") => {
-        console.log("🎬 addToWatchlist 호출됨:", { item, type });
-
         const { watchlist } = get();
-        console.log("📝 현재 watchlist:", watchlist);
 
         // 이미 찜한 콘텐츠인지 확인
         const exists = watchlist.some(
@@ -81,32 +78,20 @@ export const useWatchlistStore = create<WatchlistState>()(
           addedAt: new Date().toISOString(),
         };
 
-        console.log("✅ 새 아이템 생성:", newWatchlistItem);
-
         const newWatchlist = [newWatchlistItem, ...watchlist];
 
         set({ watchlist: newWatchlist });
-
-        console.log("💾 찜하기 목록 업데이트됨:", newWatchlist);
-        console.log("📊 총 개수:", newWatchlist.length);
       },
 
       // 찜하기 제거
       removeFromWatchlist: (id: number, type: "movie" | "tv") => {
-        console.log("🗑️ removeFromWatchlist 호출됨:", { id, type });
-
         const { watchlist } = get();
 
-        const beforeCount = watchlist.length;
         const updatedWatchlist = watchlist.filter(
           (item) => !(item.id === id && item.type === type)
         );
-        const afterCount = updatedWatchlist.length;
 
         set({ watchlist: updatedWatchlist });
-
-        console.log(`❌ 찜하기에서 제거됨: ID ${id} (${type})`);
-        console.log(`📊 개수 변화: ${beforeCount} → ${afterCount}`);
       },
 
       // 찜하기 여부 확인
@@ -116,15 +101,11 @@ export const useWatchlistStore = create<WatchlistState>()(
           (item) => item.id === id && item.type === type
         );
 
-        // 디버깅용 로그 (너무 많이 호출되므로 필요시에만 활성화)
-        // console.log(`🔍 isInWatchlist 체크: ID ${id} (${type}) → ${exists}`);
-
         return exists;
       },
 
       // 전체 찜하기 목록 초기화
       clearWatchlist: () => {
-        console.log("🧹 찜하기 목록 전체 초기화");
         set({ watchlist: [] });
       },
 
@@ -132,7 +113,6 @@ export const useWatchlistStore = create<WatchlistState>()(
       getWatchlistByType: (type: "movie" | "tv") => {
         const { watchlist } = get();
         const filtered = watchlist.filter((item) => item.type === type);
-        console.log(`📋 ${type} 타입 목록:`, filtered.length, "개");
         return filtered;
       },
 
@@ -153,7 +133,6 @@ export const useWatchlistStore = create<WatchlistState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ watchlist: state.watchlist }),
       onRehydrateStorage: () => {
-        console.log("💿 찜하기 데이터 로컬 스토리지에서 복원 중...");
         return (state, error) => {
           if (error) {
             console.error("❌ 찜하기 데이터 복원 실패:", error);
