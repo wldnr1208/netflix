@@ -1,8 +1,10 @@
 // src/components/ui/TVCard.tsx
-// Netflix 스타일 TV 프로그램 카드 컴포넌트
+// 완성된 TV 프로그램 카드 컴포넌트 (카드 클릭으로 상세 이동, 버튼들은 개별 동작)
 "use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getImageUrl, formatRating, getYear, getGenreNames } from "@/lib/utils";
 import { TVShow } from "@/types";
@@ -21,8 +23,9 @@ interface TVCardProps {
  * Netflix 스타일 TV 프로그램 카드 컴포넌트
  *
  * 기능:
+ * - 카드 클릭으로 상세 페이지 이동
  * - 호버 시 확대 및 상세 정보 표시
- * - 재생, 찜하기 버튼
+ * - 재생, 찜하기, 정보 버튼 (개별 동작)
  * - 반응형 디자인
  * - 이미지 최적화
  */
@@ -37,6 +40,8 @@ export default function TVCard({
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  const router = useRouter();
 
   // 크기별 스타일 정의
   const sizeClasses = {
@@ -68,12 +73,24 @@ export default function TVCard({
   // 연도 추출 (TV는 first_air_date 사용)
   const year = getYear(show.first_air_date);
 
-  const handlePlay = () => {
+  // TV 프로그램 제목 (name 또는 title 사용)
+  const title = show.name || show.title || "제목 없음";
+
+  // 재생 버튼 클릭 (이벤트 전파 차단)
+  const handlePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("[TVCard] ▶ 재생 버튼 클릭", show.id);
     onPlay?.(show);
   };
 
-  // TV 프로그램 제목 (name 또는 title 사용)
-  const title = show.name || show.title || "제목 없음";
+  // 정보 버튼 클릭 (이벤트 전파 차단)
+  const handleInfoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("[TVCard] ⓘ 정보 버튼 클릭 → 상세 페이지로 이동", show.id);
+    router.push(`/tv/${show.id}`);
+  };
 
   return (
     <div
@@ -84,6 +101,18 @@ export default function TVCard({
         "hover:z-20",
         className
       )}
+      onMouseDown={(e) => {
+        // 버튼이 아닌 카드 영역 클릭시에만 상세 페이지로 이동
+        const target = e.target as HTMLElement;
+        const isButton = target.closest("button");
+
+        if (!isButton) {
+          console.log("[TVCard] 카드 클릭 → 상세 페이지로 이동:", show.id);
+          e.preventDefault();
+          e.stopPropagation();
+          router.push(`/tv/${show.id}`);
+        }
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -136,7 +165,7 @@ export default function TVCard({
 
           {/* 찜하기 버튼 - 하단 오른쪽 (호버 아닐 때) */}
           {!isHovered && (
-            <div className="absolute bottom-2 right-2 z-10">
+            <div className="absolute bottom-2 right-2 z-50">
               <WatchlistButton
                 item={show}
                 type="tv"
@@ -149,7 +178,7 @@ export default function TVCard({
 
           {/* 호버 시 그라데이션 오버레이 */}
           {isHovered && (
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
           )}
         </div>
 
@@ -161,8 +190,9 @@ export default function TVCard({
               <div className="flex items-center space-x-2">
                 {/* 재생 버튼 */}
                 <button
+                  type="button"
                   onClick={handlePlay}
-                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors duration-200"
+                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors duration-200 z-50"
                   aria-label={`${title} 재생`}
                 >
                   <svg
@@ -175,17 +205,21 @@ export default function TVCard({
                 </button>
 
                 {/* 찜하기 버튼 - 호버 시 더 큰 버튼 */}
-                <WatchlistButton
-                  item={show}
-                  type="tv"
-                  size="sm"
-                  showLabel={false}
-                  className="w-8 h-8 p-0"
-                />
+                <div className="z-50">
+                  <WatchlistButton
+                    item={show}
+                    type="tv"
+                    size="sm"
+                    showLabel={false}
+                    className="w-8 h-8 p-0"
+                  />
+                </div>
 
                 {/* 상세 정보 버튼 */}
                 <button
-                  className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center hover:border-gray-300 transition-colors duration-200"
+                  type="button"
+                  onClick={handleInfoClick}
+                  className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center hover:border-gray-300 transition-colors duration-200 z-50"
                   aria-label={`${title} 상세 정보`}
                 >
                   <svg

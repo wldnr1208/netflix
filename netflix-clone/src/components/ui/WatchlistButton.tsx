@@ -1,5 +1,5 @@
 // src/components/ui/WatchlistButton.tsx
-// 찜하기 버튼 컴포넌트 (버튼 반응·토글 신뢰도 강화 버전)
+// 찜하기 버튼 컴포넌트 (TypeScript 오류 수정 버전)
 "use client";
 
 import React, { useState } from "react";
@@ -57,20 +57,37 @@ export default function WatchlistButton({
   const cur = sizeMap[size];
 
   /* ------------------------------------------------------------------
-   * ✅ 2. onPointerDown → 모바일·데스크톱 모두 첫 입력 즉시 반응
-   * ✅ 3. e.stopPropagation() 으로 카드 내부 다른 핸들러와 충돌 방지
+   * ✅ 2. 모든 이벤트에서 전파 차단 (onClick, onMouseDown, onPointerDown)
+   * ✅ 3. 찜하기 동작만 수행하고 절대 상세 페이지로 이동하지 않음
    * ------------------------------------------------------------------ */
-  const toggleWatchlist = (e: React.PointerEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
+    console.log("[WatchlistButton] 찜하기 버튼 클릭됨", item.id);
     e.preventDefault();
     e.stopPropagation();
+    toggleWatchlist();
+  };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    console.log("[WatchlistButton] 마우스 다운 이벤트");
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const toggleWatchlist = () => {
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 250);
 
     if (isWatchlisted) {
-      remove(item.id, type); // store 시그니처 맞춰 type 전송
+      remove(item.id, type);
+      console.log("[WatchlistButton] 찜 해제:", item.id);
     } else {
       add(item, type);
+      console.log("[WatchlistButton] 찜 추가:", item.id);
     }
   };
 
@@ -79,7 +96,9 @@ export default function WatchlistButton({
   return (
     <button
       type="button"
-      onPointerDown={toggleWatchlist}
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
       className={cn(
         "relative flex items-center justify-center gap-2 transition-all duration-200",
         "border-2 border-white/80 hover:border-white backdrop-blur-sm focus:outline-none",
@@ -123,7 +142,7 @@ export default function WatchlistButton({
 
       {/* 클릭 애니메이션 */}
       {isAnimating && (
-        <div className="absolute inset-0 rounded-full bg-white/20 animate-ping pointer-events-none" />
+        <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" />
       )}
     </button>
   );

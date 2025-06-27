@@ -224,6 +224,7 @@ export function getGenreNames(genreIds: number[]): string[] {
 
   return genreIds.map((id) => genreMap[id] || "기타").slice(0, 3); // 최대 3개만
 }
+
 //
 // 5단계 (검색 기능)에서 추가 예정:
 // - debounce: 검색 입력 디바운싱

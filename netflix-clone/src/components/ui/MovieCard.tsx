@@ -1,8 +1,10 @@
 // src/components/ui/MovieCard.tsx
+// 완성된 영화 카드 컴포넌트 (카드 클릭으로 상세 이동, 버튼들은 개별 동작)
 "use client";
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getImageUrl, formatRating, getYear, getGenreNames } from "@/lib/utils";
 import { MovieCardProps } from "@/types";
@@ -24,6 +26,8 @@ export default function MovieCard({
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  const router = useRouter();
 
   const typedMovie = movie as MovieWithType;
   const itemType: "movie" | "tv" =
@@ -52,7 +56,21 @@ export default function MovieCard({
   const genreNames = getGenreNames(movie.genre_ids);
   const year = getYear(movie.release_date);
 
-  const handlePlay = () => onPlay?.(movie);
+  // 재생 버튼 클릭 (이벤트 전파 차단)
+  const handlePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("[MovieCard] ▶ 재생 버튼 클릭", movie.id);
+    onPlay?.(movie);
+  };
+
+  // 정보 버튼 클릭 (이벤트 전파 차단)
+  const handleInfoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("[MovieCard] ⓘ 정보 버튼 클릭 → 상세 페이지로 이동", movie.id);
+    router.push(`/movies/${movie.id}`);
+  };
 
   return (
     <div
@@ -63,6 +81,18 @@ export default function MovieCard({
         "hover:z-20",
         className
       )}
+      onMouseDown={(e) => {
+        // 버튼이 아닌 카드 영역 클릭시에만 상세 페이지로 이동
+        const target = e.target as HTMLElement;
+        const isButton = target.closest("button");
+
+        if (!isButton) {
+          console.log("[MovieCard] 카드 클릭 → 상세 페이지로 이동:", movie.id);
+          e.preventDefault();
+          e.stopPropagation();
+          router.push(`/movies/${movie.id}`);
+        }
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -104,9 +134,9 @@ export default function MovieCard({
             </div>
           )}
 
-          {/* ❗ z-index + hover시 가려지지 않도록 설정 */}
+          {/* 비호버 상태의 찜하기 버튼 */}
           {!isHovered && (
-            <div className="absolute top-2 right-2 z-30">
+            <div className="absolute top-2 right-2 z-50">
               <WatchlistButton
                 item={movie}
                 type={itemType}
@@ -117,7 +147,7 @@ export default function MovieCard({
             </div>
           )}
 
-          {/* ❗ 호버 배경에 pointer-events-none 추가 */}
+          {/* 호버 배경 */}
           {isHovered && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
           )}
@@ -128,9 +158,11 @@ export default function MovieCard({
           <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
+                {/* 재생 버튼 */}
                 <button
+                  type="button"
                   onClick={handlePlay}
-                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors duration-200"
+                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors duration-200 z-50"
                   aria-label={`${movie.title} 재생`}
                 >
                   <svg
@@ -142,16 +174,22 @@ export default function MovieCard({
                   </svg>
                 </button>
 
-                <WatchlistButton
-                  item={movie}
-                  type={itemType}
-                  size="sm"
-                  showLabel={false}
-                  className="w-8 h-8 p-0 z-30"
-                />
+                {/* 찜하기 버튼 */}
+                <div className="z-50">
+                  <WatchlistButton
+                    item={movie}
+                    type={itemType}
+                    size="sm"
+                    showLabel={false}
+                    className="w-8 h-8 p-0"
+                  />
+                </div>
 
+                {/* 정보 버튼 */}
                 <button
-                  className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center hover:border-gray-300 transition-colors duration-200"
+                  type="button"
+                  onClick={handleInfoClick}
+                  className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center hover:border-gray-300 transition-colors duration-200 z-50"
                   aria-label={`${movie.title} 상세 정보`}
                 >
                   <svg

@@ -95,7 +95,7 @@ export interface LoginPageProps {
 // 4단계에서 추가: 영화 관련 타입들
 
 /**
- * TMDB 영화 데이터 타입
+ * TMDB 영화 데이터 타입 (기본)
  */
 export interface Movie {
   id: number;
@@ -112,10 +112,21 @@ export interface Movie {
   original_language: string;
   popularity: number;
   video: boolean;
+  // 상세 정보에서 추가되는 속성들 (옵셔널)
+  genres?: Genre[];
+  runtime?: number;
+  budget?: number;
+  revenue?: number;
+  production_companies?: ProductionCompany[];
+  production_countries?: ProductionCountry[];
+  spoken_languages?: SpokenLanguage[];
+  status?: string;
+  tagline?: string;
+  homepage?: string;
 }
 
 /**
- * TMDB TV 프로그램 데이터 타입
+ * TMDB TV 프로그램 데이터 타입 (기본)
  */
 export interface TVShow {
   id: number;
@@ -133,6 +144,24 @@ export interface TVShow {
   origin_country: string[];
   original_language: string;
   popularity: number;
+  // 상세 정보에서 추가되는 속성들 (옵셔널)
+  genres?: Genre[];
+  number_of_episodes?: number;
+  number_of_seasons?: number;
+  episode_run_time?: number[];
+  networks?: Network[];
+  production_companies?: ProductionCompany[];
+  production_countries?: ProductionCountry[];
+  spoken_languages?: SpokenLanguage[];
+  created_by?: Creator[];
+  seasons?: Season[];
+  status?: string;
+  type?: string;
+  last_air_date?: string;
+  next_episode_to_air?: Episode;
+  last_episode_to_air?: Episode;
+  homepage?: string;
+  tagline?: string;
 }
 
 /**
@@ -141,6 +170,84 @@ export interface TVShow {
 export interface Genre {
   id: number;
   name: string;
+}
+
+/**
+ * 제작사 타입
+ */
+export interface ProductionCompany {
+  id: number;
+  name: string;
+  logo_path: string | null;
+  origin_country: string;
+}
+
+/**
+ * 제작 국가 타입
+ */
+export interface ProductionCountry {
+  iso_3166_1: string;
+  name: string;
+}
+
+/**
+ * 언어 타입
+ */
+export interface SpokenLanguage {
+  iso_639_1: string;
+  name: string;
+  english_name: string;
+}
+
+/**
+ * 네트워크 타입 (TV 전용)
+ */
+export interface Network {
+  id: number;
+  name: string;
+  logo_path: string | null;
+  origin_country: string;
+}
+
+/**
+ * 제작자 타입 (TV 전용)
+ */
+export interface Creator {
+  id: number;
+  name: string;
+  gender: number;
+  profile_path: string | null;
+}
+
+/**
+ * 시즌 타입 (TV 전용)
+ */
+export interface Season {
+  id: number;
+  air_date: string;
+  episode_count: number;
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  season_number: number;
+}
+
+/**
+ * 에피소드 타입 (TV 전용)
+ */
+export interface Episode {
+  id: number;
+  name: string;
+  overview: string;
+  vote_average: number;
+  vote_count: number;
+  air_date: string;
+  episode_number: number;
+  production_code: string;
+  runtime: number;
+  season_number: number;
+  show_id: number;
+  still_path: string | null;
 }
 
 /**
@@ -224,6 +331,19 @@ export interface TVSectionProps {
 }
 
 /**
+ * 영화 슬라이더 컴포넌트 Props
+ */
+export interface MovieSliderProps {
+  movies: Movie[];
+  title: string;
+  isLoading?: boolean;
+  onMovieClick?: (movie: Movie) => void;
+  showSeeAll?: boolean;
+  onSeeAllClick?: () => void;
+  className?: string;
+}
+
+/**
  * TV 슬라이더 컴포넌트 Props
  */
 export interface TVSliderProps {
@@ -288,19 +408,3 @@ export interface WatchlistButtonProps {
   showLabel?: boolean;
   className?: string;
 }
-
-/**
- * 영화 슬라이더 컴포넌트 Props
- */
-export interface MovieSliderProps {
-  movies: Movie[];
-  title: string;
-  isLoading?: boolean;
-  onMovieClick?: (movie: Movie) => void;
-  onMovieAddToWatchlist?: (movie: Movie) => void;
-  showSeeAll?: boolean;
-  onSeeAllClick?: () => void;
-  className?: string;
-}
-// - HeaderProps (헤더 컴포넌트) - 헤더 완성 후 추가 예정
-//  onAddToWatchlist?: (movie: Movie) => void;
