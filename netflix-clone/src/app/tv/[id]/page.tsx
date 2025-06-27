@@ -94,7 +94,7 @@ export default function TVDetailPage() {
   return (
     <div className="min-h-screen netflix-bg-gray-dark">
       {/* 히어로 섹션 */}
-      <section className="relative h-screen">
+      <section className="relative min-h-[80vh] lg:h-screen">
         {/* 배경 이미지 */}
         <div className="absolute inset-0">
           <Image
@@ -110,7 +110,7 @@ export default function TVDetailPage() {
 
         {/* 컨텐츠 */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-3 sm:px-4 md:px-6	">
             <div className="max-w-6xl">
               {/* 뒤로가기 버튼 */}
               <div className="mb-6 pt-20">
@@ -139,7 +139,7 @@ export default function TVDetailPage() {
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* 포스터 */}
                 <div className="lg:col-span-1">
-                  <div className="relative aspect-[2/3] max-w-sm mx-auto lg:mx-0">
+                  <div className="relative aspect-[2/3] w-44 xs:w-52 sm:w-60 md:w-72 lg:w-auto mx-auto lg:mx-0	">
                     <Image
                       src={posterUrl}
                       alt={title}
@@ -153,7 +153,7 @@ export default function TVDetailPage() {
                 <div className="lg:col-span-3 space-y-6">
                   {/* 제목 및 기본 정보 */}
                   <div>
-                    <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
+                    <h1 className="ttext-2xl xs:text-3xl sm:text-4xl md:text-5xl">
                       {title}
                     </h1>
                     {show.original_name !== title && (
@@ -217,14 +217,14 @@ export default function TVDetailPage() {
                       <h3 className="text-xl font-semibold text-white mb-3">
                         줄거리
                       </h3>
-                      <p className="text-white/90 leading-relaxed text-lg max-w-4xl">
+                      <p className="text-xs xs:text-sm sm:text-base">
                         {show.overview}
                       </p>
                     </div>
                   )}
 
                   {/* 액션 버튼들 */}
-                  <div className="flex flex-wrap gap-4 pt-4">
+                  <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
                     {/* 재생 버튼 - 예고편 모달 연동 */}
                     {trailersLoading ? (
                       <button
@@ -256,14 +256,6 @@ export default function TVDetailPage() {
                       size="lg"
                       showLabel={true}
                     />
-
-                    <Button
-                      variant="secondary"
-                      size="lg"
-                      onClick={() => alert("에피소드 목록 (개발 예정)")}
-                    >
-                      📺 에피소드 목록
-                    </Button>
 
                     {/* 추가 예고편 버튼 (기존 방식) */}
                     <TrailerButton

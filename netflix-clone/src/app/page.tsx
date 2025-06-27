@@ -4,8 +4,6 @@
 
 import React from "react";
 import { useSession } from "next-auth/react";
-import Button from "@/components/ui/Button";
-import PlayButton from "@/components/ui/PlayButton";
 
 import { useHomePageMovies } from "@/hooks/useMovies";
 import { useHomePageTVShows } from "@/hooks/useTVShows";
@@ -91,17 +89,6 @@ export default function HomePage() {
               로그인하여 더 많은 기능을 이용해보세요
             </p>
           )}
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
-            <PlayButton size="lg" onPlay={() => alert("재생 버튼 클릭!")} />
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => alert("상세 정보 클릭!")}
-            >
-              ℹ️ 상세 정보
-            </Button>
-          </div>
         </div>
       </section>
 
