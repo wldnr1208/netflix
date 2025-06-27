@@ -1,5 +1,5 @@
 // src/components/providers/QueryProvider.tsx
-// React Query Provider 설정
+// React Query Provider 설정 (비디오 API 포함)
 
 "use client";
 
@@ -89,6 +89,8 @@ export const queryKeys = {
       [...queryKeys.movies.all(), "similar", id] as const,
     recommendations: (id: number) =>
       [...queryKeys.movies.all(), "recommendations", id] as const,
+    // 비디오(예고편) 관련 키 추가
+    videos: (id: number) => [...queryKeys.movies.all(), "videos", id] as const,
   },
 
   // TV 프로그램 관련 쿼리 키들
@@ -101,6 +103,8 @@ export const queryKeys = {
     detail: (id: number) => [...queryKeys.tv.details(), id] as const,
     search: (query: string, page?: number) =>
       [...queryKeys.tv.all(), "search", query, page] as const,
+    // 비디오(예고편) 관련 키 추가
+    videos: (id: number) => [...queryKeys.tv.all(), "videos", id] as const,
   },
 
   // 장르 관련 쿼리 키들
@@ -115,6 +119,14 @@ export const queryKeys = {
     all: () => ["trending"] as const,
     list: (mediaType: string, timeWindow: string) =>
       [...queryKeys.trending.all(), mediaType, timeWindow] as const,
+  },
+
+  // 비디오 관련 쿼리 키들 (통합)
+  videos: {
+    all: () => ["videos"] as const,
+    movie: (movieId: number) =>
+      [...queryKeys.videos.all(), "movie", movieId] as const,
+    tv: (tvId: number) => [...queryKeys.videos.all(), "tv", tvId] as const,
   },
 } as const;
 

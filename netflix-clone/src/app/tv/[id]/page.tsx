@@ -1,27 +1,38 @@
 // src/app/tv/[id]/page.tsx
-// TV 프로그램 상세 페이지 (실제 API 사용)
+// TV 프로그램 상세 페이지 (예고편 모달 통합)
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useTVShowDetails, useHomePageTVShows } from "@/hooks/useTVShows";
+import { useTVTrailers } from "@/hooks/useVideos";
 import { getImageUrl, formatRating, getYear } from "@/lib/utils";
 import { TVShow } from "@/types";
 import Button from "@/components/ui/Button";
-import PlayButton from "@/components/ui/PlayButton";
 import WatchlistButton from "@/components/ui/WatchlistButton";
 import TVSlider from "@/components/ui/TVSlider";
 import { MovieSliderGroup } from "@/components/ui/MovieSliderGroup";
+import VideoModal, { TrailerButton } from "@/components/ui/VideoModal";
 
 export default function TVDetailPage() {
   const params = useParams();
   const router = useRouter();
   const showId = parseInt(params.id as string);
 
+  // 비디오 모달 상태
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
   // TV 프로그램 상세 정보 가져오기
   const { data: show, isLoading, error } = useTVShowDetails(showId);
+
+  // 예고편 정보 가져오기
+  const {
+    mainTrailer,
+    hasTrailers,
+    isLoading: trailersLoading,
+  } = useTVTrailers(showId);
 
   // 추천 TV 프로그램 가져오기
   const { popular: popularShows, topRated: topRatedShows } =
@@ -30,6 +41,16 @@ export default function TVDetailPage() {
   // TV 프로그램 클릭 핸들러
   const handleTVClick = (clickedShow: TVShow) => {
     router.push(`/tv/${clickedShow.id}`);
+  };
+
+  // 재생 버튼 클릭 핸들러
+  const handlePlayClick = () => {
+    if (mainTrailer) {
+      setIsVideoModalOpen(true);
+    } else {
+      const title = show?.name || show?.title || "이 TV 프로그램";
+      alert(`${title}의 예고편을 찾을 수 없습니다.`);
+    }
   };
 
   // 로딩 상태
@@ -204,10 +225,30 @@ export default function TVDetailPage() {
 
                   {/* 액션 버튼들 */}
                   <div className="flex flex-wrap gap-4 pt-4">
-                    <PlayButton
-                      size="lg"
-                      onPlay={() => alert(`${title} 재생 (개발 예정)`)}
-                    />
+                    {/* 재생 버튼 - 예고편 모달 연동 */}
+                    {trailersLoading ? (
+                      <button
+                        disabled
+                        className="px-6 py-3 bg-white/60 text-black rounded-lg transition-colors flex items-center gap-2 font-medium cursor-not-allowed"
+                      >
+                        <span className="animate-spin w-4 h-4 border-2 border-black border-t-transparent rounded-full"></span>
+                        예고편 로딩 중...
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handlePlayClick}
+                        className="px-6 py-3 bg-white text-black hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 font-medium"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        {hasTrailers ? "예고편 재생" : "예고편 재생 (없음)"}
+                      </button>
+                    )}
 
                     <WatchlistButton
                       item={show}
@@ -224,13 +265,14 @@ export default function TVDetailPage() {
                       📺 에피소드 목록
                     </Button>
 
-                    <Button
+                    {/* 추가 예고편 버튼 (기존 방식) */}
+                    <TrailerButton
+                      video={mainTrailer}
+                      title={title}
                       variant="secondary"
-                      size="lg"
-                      onClick={() => alert("예고편 재생 (개발 예정)")}
                     >
-                      🎬 예고편
-                    </Button>
+                      🎬 더 많은 예고편
+                    </TrailerButton>
                   </div>
 
                   {/* 추가 정보 */}
@@ -347,6 +389,14 @@ export default function TVDetailPage() {
           </MovieSliderGroup>
         </section>
       ) : null}
+
+      {/* 비디오 모달 */}
+      <VideoModal
+        video={mainTrailer}
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        title={title}
+      />
     </div>
   );
 }

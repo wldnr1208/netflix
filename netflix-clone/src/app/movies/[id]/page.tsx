@@ -1,23 +1,27 @@
 // src/app/movies/[id]/page.tsx
-// 영화 상세 페이지
+// 영화 상세 페이지 (예고편 모달 통합)
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useMovieDetails, useSimilarMovies } from "@/hooks/useMovies";
+import { useMovieTrailers } from "@/hooks/useVideos";
 import { getImageUrl, formatRating, getYear, formatRuntime } from "@/lib/utils";
 import { Movie } from "@/types";
 import Button from "@/components/ui/Button";
-import PlayButton from "@/components/ui/PlayButton";
 import WatchlistButton from "@/components/ui/WatchlistButton";
 import MovieSlider from "@/components/ui/MovieSlider";
 import { MovieSliderGroup } from "@/components/ui/MovieSliderGroup";
+import VideoModal, { TrailerButton } from "@/components/ui/VideoModal";
 
 export default function MovieDetailPage() {
   const params = useParams();
   const movieId = parseInt(params.id as string);
+
+  // 비디오 모달 상태
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   // 영화 상세 정보 가져오기
   const { data: movie, isLoading, error } = useMovieDetails(movieId);
@@ -25,9 +29,25 @@ export default function MovieDetailPage() {
   // 비슷한 영화 가져오기
   const { data: similarMovies } = useSimilarMovies(movieId);
 
+  // 예고편 정보 가져오기
+  const {
+    mainTrailer,
+    hasTrailers,
+    isLoading: trailersLoading,
+  } = useMovieTrailers(movieId);
+
   // 영화 클릭 핸들러
   const handleMovieClick = (clickedMovie: Movie) => {
     window.location.href = `/movies/${clickedMovie.id}`;
+  };
+
+  // 재생 버튼 클릭 핸들러
+  const handlePlayClick = () => {
+    if (mainTrailer) {
+      setIsVideoModalOpen(true);
+    } else {
+      alert(`${movie?.title}의 예고편을 찾을 수 없습니다.`);
+    }
   };
 
   // 로딩 상태
@@ -189,23 +209,43 @@ export default function MovieDetailPage() {
 
                   {/* 액션 버튼들 */}
                   <div className="flex flex-wrap gap-4">
-                    <PlayButton
-                      size="lg"
-                      onPlay={() => alert(`${movie.title} 재생 (개발 예정)`)}
-                    />
+                    {/* 재생 버튼 - 예고편 모달 연동 */}
+                    {trailersLoading ? (
+                      <Button variant="primary" size="lg" disabled>
+                        <span className="animate-spin w-4 h-4 border-2 border-black border-t-transparent rounded-full mr-2"></span>
+                        예고편 로딩 중...
+                      </Button>
+                    ) : (
+                      <button
+                        onClick={handlePlayClick}
+                        className="px-6 py-3 bg-white text-black hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 font-medium"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        {hasTrailers ? "예고편 재생" : "예고편 재생 (없음)"}
+                      </button>
+                    )}
+
                     <WatchlistButton
                       item={movie}
                       type="movie"
                       size="lg"
                       showLabel={true}
                     />
-                    <Button
+
+                    {/* 추가 예고편 버튼 (기존 방식) */}
+                    <TrailerButton
+                      video={mainTrailer}
+                      title={movie.title}
                       variant="secondary"
-                      size="lg"
-                      onClick={() => alert("예고편 재생 (개발 예정)")}
                     >
-                      🎬 예고편
-                    </Button>
+                      🎬 더 많은 예고편
+                    </TrailerButton>
                   </div>
 
                   {/* 추가 정보 */}
@@ -281,6 +321,14 @@ export default function MovieDetailPage() {
           </MovieSliderGroup>
         </section>
       )}
+
+      {/* 비디오 모달 */}
+      <VideoModal
+        video={mainTrailer}
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        title={movie.title}
+      />
     </div>
   );
 }

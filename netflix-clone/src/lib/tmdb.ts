@@ -1,5 +1,5 @@
 // src/lib/tmdb.ts
-// TMDB API 서비스 함수들
+// TMDB API 서비스 함수들 (비디오 API 포함)
 
 import axios from "axios";
 import {
@@ -10,6 +10,8 @@ import {
   MovieCategory,
   TVCategory,
   Genre,
+  TMDBVideo,
+  TMDBVideosResponse,
 } from "@/types";
 
 // TMDB API 설정
@@ -110,6 +112,134 @@ export class TMDBService {
       );
       throw new Error("TV 프로그램 상세 정보를 가져올 수 없습니다.");
     }
+  }
+
+  /**
+   * 영화 비디오(예고편) 정보 가져오기
+   * @param movieId - 영화 ID
+   * @returns Promise<TMDBVideosResponse>
+   */
+  static async getMovieVideos(movieId: number): Promise<TMDBVideosResponse> {
+    try {
+      // 먼저 한국어로 시도
+      const response = await tmdbApi.get<TMDBVideosResponse>(
+        `/movie/${movieId}/videos`,
+        {
+          params: { language: "ko-KR" },
+        }
+      );
+
+      // 한국어 결과가 없으면 영어로 재시도
+      if (!response.data.results || response.data.results.length === 0) {
+        const enResponse = await tmdbApi.get<TMDBVideosResponse>(
+          `/movie/${movieId}/videos`,
+          {
+            params: { language: "en-US" },
+          }
+        );
+        return enResponse.data;
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error(`영화 비디오 정보 가져오기 실패 (ID: ${movieId}):`, error);
+      throw new Error("영화 비디오 정보를 가져올 수 없습니다.");
+    }
+  }
+
+  /**
+   * TV 프로그램 비디오(예고편) 정보 가져오기
+   * @param tvId - TV 프로그램 ID
+   * @returns Promise<TMDBVideosResponse>
+   */
+  static async getTVVideos(tvId: number): Promise<TMDBVideosResponse> {
+    try {
+      // 먼저 한국어로 시도
+      const response = await tmdbApi.get<TMDBVideosResponse>(
+        `/tv/${tvId}/videos`,
+        {
+          params: { language: "ko-KR" },
+        }
+      );
+
+      // 한국어 결과가 없으면 영어로 재시도
+      if (!response.data.results || response.data.results.length === 0) {
+        const enResponse = await tmdbApi.get<TMDBVideosResponse>(
+          `/tv/${tvId}/videos`,
+          {
+            params: { language: "en-US" },
+          }
+        );
+        return enResponse.data;
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error(
+        `TV 프로그램 비디오 정보 가져오기 실패 (ID: ${tvId}):`,
+        error
+      );
+      throw new Error("TV 프로그램 비디오 정보를 가져올 수 없습니다.");
+    }
+  }
+
+  /**
+   * 예고편 필터링 헬퍼 함수
+   * @param videos - 비디오 목록
+   * @returns 필터링된 예고편 목록
+   */
+  static filterTrailers(videos: TMDBVideo[]): TMDBVideo[] {
+    return videos
+      .filter(
+        (video) =>
+          video.site === "YouTube" &&
+          (video.type === "Trailer" || video.type === "Teaser") &&
+          video.official
+      )
+      .sort((a, b) => {
+        // Trailer을 Teaser보다 우선순위로 정렬
+        if (a.type === "Trailer" && b.type === "Teaser") return -1;
+        if (a.type === "Teaser" && b.type === "Trailer") return 1;
+        // 최신순으로 정렬
+        return (
+          new Date(b.published_at).getTime() -
+          new Date(a.published_at).getTime()
+        );
+      });
+  }
+
+  /**
+   * YouTube URL 생성
+   * @param videoKey - YouTube 비디오 키
+   * @param autoplay - 자동 재생 여부
+   * @returns YouTube URL
+   */
+  static getYouTubeUrl(videoKey: string, autoplay: boolean = false): string {
+    const baseUrl = "https://www.youtube.com/watch";
+    const params = new URLSearchParams({
+      v: videoKey,
+      ...(autoplay && { autoplay: "1" }),
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  /**
+   * YouTube Embed URL 생성
+   * @param videoKey - YouTube 비디오 키
+   * @param autoplay - 자동 재생 여부
+   * @returns YouTube Embed URL
+   */
+  static getYouTubeEmbedUrl(
+    videoKey: string,
+    autoplay: boolean = false
+  ): string {
+    const baseUrl = "https://www.youtube.com/embed";
+    const params = new URLSearchParams({
+      ...(autoplay && { autoplay: "1" }),
+      rel: "0", // 관련 동영상 표시 안함
+      modestbranding: "1", // YouTube 로고 최소화
+    });
+    return `${baseUrl}/${videoKey}?${params.toString()}`;
   }
 
   /**

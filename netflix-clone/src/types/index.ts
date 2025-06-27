@@ -1,5 +1,5 @@
 // src/types/index.ts
-// Netflix 클론 프로젝트의 기본 타입 정의 (TV 프로그램 완성)
+// Netflix 클론 프로젝트의 기본 타입 정의 (비디오 타입 추가)
 
 // 현재 2단계에서 실제로 사용하는 타입들만 정의
 
@@ -248,6 +248,51 @@ export interface Episode {
   season_number: number;
   show_id: number;
   still_path: string | null;
+}
+
+// 비디오 관련 타입들 (예고편 재생 기능)
+
+/**
+ * TMDB 비디오 정보 타입
+ */
+export interface TMDBVideo {
+  id: string;
+  key: string;
+  name: string;
+  site: string; // YouTube, Vimeo 등
+  type: string; // Trailer, Teaser, Clip 등
+  official: boolean;
+  published_at: string;
+  size: number; // 720, 1080 등
+}
+
+/**
+ * TMDB 비디오 응답 타입
+ */
+export interface TMDBVideosResponse {
+  id: number;
+  results: TMDBVideo[];
+}
+
+/**
+ * 비디오 모달 Props
+ */
+export interface VideoModalProps {
+  video: TMDBVideo | null;
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+}
+
+/**
+ * 예고편 버튼 Props
+ */
+export interface TrailerButtonProps {
+  video: TMDBVideo | null;
+  title?: string;
+  className?: string;
+  children?: React.ReactNode;
+  variant?: "primary" | "secondary";
 }
 
 /**
