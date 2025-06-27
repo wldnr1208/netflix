@@ -312,7 +312,7 @@ export default function HomePage() {
                 <p className="text-green-400">✅ 로딩 스켈레톤</p>
                 <p className="text-green-400">✅ React Query 캐싱</p>
                 <p className="text-green-400">✅ 찜하기 기능</p>
-                <p className="text-yellow-400">🚧 상세 페이지</p>
+                <p className="text-yellow-400">✅ 상세 페이지</p>
               </div>
             </div>
           </div>
