@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import AppProvider from "@/components/providers/AppProvider";
 import "./globals.css";
+import SessionWrapper from "@/components/providers/SessionWrapper";
 
 // Inter 폰트 설정 (Netflix는 Helvetica Neue를 사용하지만 웹에서는 Inter가 좋은 대안)
 const inter = Inter({
@@ -128,7 +129,9 @@ export default function RootLayout({
         {/* 메인 앱 컨테이너 */}
         <div id="root" className="relative">
           {/* Client Component로 헤더와 메인 콘텐츠 관리 */}
-          <AppProvider>{children}</AppProvider>
+          <SessionWrapper>
+            <AppProvider>{children}</AppProvider>
+          </SessionWrapper>
 
           {/* 여기에 푸터가 들어갈 예정 */}
         </div>

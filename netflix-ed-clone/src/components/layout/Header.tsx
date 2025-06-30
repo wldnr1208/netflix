@@ -13,6 +13,7 @@ import MenuIcon from "@/components/ui/icons/MenuIcon";
 import XIcon from "@/components/ui/icons/XIcon";
 import ChevronDownIcon from "@/components/ui/icons/ChevronDownIcon";
 import Button from "../ui/Button/Button";
+import { signOut, useSession } from "next-auth/react";
 
 // 현재 Header에서만 사용하는 타입 (나중에 types/index.ts로 이동 예정)
 interface HeaderProps {
@@ -39,6 +40,9 @@ export default function Header({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  //로그인 세션의 상태와 유저 정보를 가져옴
+  const { data: session, status } = useSession();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // 스크롤 이벤트 처리
   useEffect(() => {
@@ -66,6 +70,14 @@ export default function Header({
     { name: "최신", href: "/latest" },
     { name: "내가 찜한 콘텐츠", href: "/my-list" },
   ];
+  // 로그아웃 처리
+  const handleSignOut = async () => {
+    try {
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
+      console.error("로그아웃 오류:", error);
+    }
+  };
 
   return (
     <header
@@ -148,21 +160,50 @@ export default function Header({
 
             {/* 사용자 프로필 */}
             {/* user가 정의되면 활성화 예정 */}
-            {false ? ( // user ? ( 로 나중에 변경
-              <div className="relative">
-                <button className="flex items-center space-x-2 p-2 rounded hover:bg-white/10 transition-colors duration-200">
+            {status === "loading" ? (
+              <div className="w-8 h-8 bg-netflix-gray rounded animate-pulse"></div>
+            ) : session?.user ? (
+              <div className="relative" data-profile-menu>
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="flex items-center space-x-2 p-2 rounded hover:bg-white/10 transition-colors duration-200"
+                >
                   <div className="w-8 h-8 bg-netflix-red rounded flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      U {/* {user.name.charAt(0).toUpperCase()} */}
+                      {session.user.name?.charAt(0).toUpperCase() || "U"}
                     </span>
                   </div>
                   <ChevronDownIcon />
                 </button>
+
+                {/* 프로필 드롭다운 메뉴 */}
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-netflix-gray-dark border border-netflix-gray rounded-sm shadow-lg z-50">
+                    <div className="py-2">
+                      <div className="px-4 py-2 border-b border-netflix-gray">
+                        <p className="text-sm font-medium text-white">
+                          {session.user.name}
+                        </p>
+                        <p className="text-xs text-netflix-gray-light">
+                          {session.user.email}
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        로그아웃
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
-              <Button variant="primary" size="sm">
-                로그인
-              </Button>
+              <Link href="/auth/signin">
+                <Button variant="primary" size="sm">
+                  로그인
+                </Button>
+              </Link>
             )}
 
             {/* 모바일 메뉴 버튼 */}
@@ -175,7 +216,6 @@ export default function Header({
             </button>
           </div>
         </div>
-
         {/* 모바일 네비게이션 */}
         {isMobileMenuOpen && (
           <div className="lg:hidden py-4 border-t border-white/10 animate-slide-up">
