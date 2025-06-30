@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { validateEmail } from "@/lib/utils";
 import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button/Button";
 import { LoginFormData, ValidationError } from "@/types";
 
 interface LoginFormProps {

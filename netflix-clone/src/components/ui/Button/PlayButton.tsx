@@ -6,7 +6,7 @@
 import React from "react";
 import Button from "./Button";
 import { cn } from "@/lib/utils";
-import PlayIcon from "./icons/PlayIcon";
+import PlayIcon from "../icons/PlayIcon";
 
 interface PlayButtonProps {
   // movie?: Movie; // 나중에 Movie 타입 만들어지면 추가 예정

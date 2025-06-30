@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/common/Logo";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button/Button";
 import SearchIcon from "@/components/ui/icons/SearchIcon";
 import BellIcon from "@/components/ui/icons/BellIcon";
 import MenuIcon from "@/components/ui/icons/MenuIcon";

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { validateEmail, getPasswordStrength } from "@/lib/utils";
 import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button/Button";
 import PasswordStrength from "@/components/ui/PasswordStrength";
 import { SignUpFormData, ValidationError } from "@/types";
 

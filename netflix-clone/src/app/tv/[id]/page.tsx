@@ -10,7 +10,7 @@ import { useTVShowDetails, useHomePageTVShows } from "@/hooks/useTVShows";
 import { useTVTrailers } from "@/hooks/useVideos";
 import { getImageUrl, formatRating, getYear } from "@/lib/utils";
 import { TVShow } from "@/types";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button/Button";
 import WatchlistButton from "@/components/ui/WatchlistButton";
 import TVSlider from "@/components/ui/TVSlider";
 import { MovieSliderGroup } from "@/components/ui/MovieSliderGroup";

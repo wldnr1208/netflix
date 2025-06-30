@@ -7,7 +7,7 @@ import React from "react";
 import { signIn } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import Button from "./Button";
-import GoogleIcon from "./icons/GoogleIcon";
+import GoogleIcon from "../icons/GoogleIcon";
 import { SocialProvider } from "@/types";
 
 interface SocialLoginButtonProps {

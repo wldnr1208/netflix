@@ -8,7 +8,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Logo from "@/components/common/Logo";
 import SignUpForm from "@/components/auth/SignUpForm";
-import { GoogleLoginButton } from "@/components/ui/SocialLoginButton";
+import { GoogleLoginButton } from "@/components/ui/Button/SocialLoginButton";
 
 /**
  * Netflix 스타일 회원가입 페이지

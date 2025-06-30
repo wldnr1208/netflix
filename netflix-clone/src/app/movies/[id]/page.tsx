@@ -10,7 +10,7 @@ import { useMovieDetails, useSimilarMovies } from "@/hooks/useMovies";
 import { useMovieTrailers } from "@/hooks/useVideos";
 import { getImageUrl, formatRating, getYear, formatRuntime } from "@/lib/utils";
 import { Movie } from "@/types";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button/Button";
 import WatchlistButton from "@/components/ui/WatchlistButton";
 import MovieSlider from "@/components/ui/MovieSlider";
 import { MovieSliderGroup } from "@/components/ui/MovieSliderGroup";

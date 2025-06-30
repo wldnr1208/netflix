@@ -7,7 +7,7 @@ import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/components/common/Logo";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button/Button";
 
 /**
  * 오류 콘텐츠 컴포넌트 (Suspense로 감싸진)

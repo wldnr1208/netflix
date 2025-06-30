@@ -8,7 +8,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Logo from "@/components/common/Logo";
 import LoginForm from "@/components/auth/LoginForm";
-import { GoogleLoginButton } from "@/components/ui/SocialLoginButton";
+import { GoogleLoginButton } from "@/components/ui/Button/SocialLoginButton";
 import { LoginPageProps } from "@/types";
 
 /**
